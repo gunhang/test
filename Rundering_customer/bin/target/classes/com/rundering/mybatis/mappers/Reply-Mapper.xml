@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="Reply-Mapper">
+ 	<resultMap type="reply" id="replyMap">
+ 		<result column="REPLYNO" 		property="replyno" />
+ 		<result column="REPLY_CONTENT"  property="replyContent" />
+ 		<result column="MEMBERNO" 		property="memberno" />
+ 		<result column="REGIST_DATE" 	property="registDate" />
+ 		<result column="MODIFY_DATE" 	property="modifyDate" />
+ 		<result column="REPLYNO_SEQ" 	property="replynoSeq" />
+ 		<result column="ATCH_FILE_NO"	property="atchFileNo" />
+ 		<result column="DELETE_YN"		property="deleteYn" />
+ 	
+ 	</resultMap>
+ 	<select id="selectReplyByReplyNo" resultMap="replyMap">
+ 		select *
+ 		  from TB_REPLY
+ 		 where REPLYNO=#{replyno} 
+ 		  from tb_reply
+ 		 where replyno=#{replyno}
+ 		   and delete_yn = 'N'
+ 		 order by regist_date asc 
+ 	</select>
+ 	<select id="selectReplyCountByReplyno">
+ 		select count(replyno_seq)
+ 		  from tb_reply
+ 		 where replyno=#{replyno}
+ 		   and delete_yn = 'N'
+ 	</select>
+ 	<select id="selectReplySeq" resultType="int">
+ 		select replyno_seq.nextval
+ 		  from dual
+ 	</select>
+ 	<insert id="insertReplyByReplyVO" parameterType="reply">
+ 		insert into tb_reply
+ 		(REPLYNO,
+ 	     REPLY_CONTENT,
+ 	     MEMBERNO,
+ 	     REPLYNO_SEQ
+ 		)
+ 		values( select #{replyno},
+		 			   #{replyContent},
+		 			   #{memberno},
+		 			   max(replyno_seq)+1
+		 		  from tb_reply
+ 		)
+ 	</insert>
+ 	
+	<insert id="insertReplyByReplyVOFirst" parameterType="reply">
+		insert into tb_reply
+		(REPLYNO,
+	     REPLY_CONTENT,
+	     MEMBERNO,
+		)
+		values( #{replyno},
+	 			#{replyContent},
+	 			 #{memberno}
+		)
+ 	</insert>
+ 	
+	<select id="selectReplySeqNextValue" resultType="int" >
+		select TB_REPLY_seq.nextval
+		from dual		
+	</select>
+	
+	<select id="selectReplyList" resultType="reply">
+		select *
+		from TB_REPLY
+		where REPLYNO=#{replyno}
+		order by replyno asc
+	</select>
+	
+	<update id="insertReply" >
+		insert into TB_REPLY(replyno,replyContent,memberno)
+		values(#{replyno},#{replyContent},#{memberno})
+	</update>
+	
+	<update id="updateReply" parameterType="reply">
+		update TB_REPLY
+		set 
+		replyContent=#{replyContent},
+		updatedate=sysdate
+		where replyno=#{replyno}		
+	</update>
+	
+	<update id="deleteReply" parameterType="int">
+		delete from TB_REPLY
+		where replyno=#{replyno}		
+	</update>	
+ 
+ </mapper>

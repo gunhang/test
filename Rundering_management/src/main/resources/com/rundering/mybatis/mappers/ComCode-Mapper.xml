@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ComCode-Mapper">
+	<resultMap type="comCode" id="comCodeMap">
+		<result column="COM_CODE_GRP" property="comCodeGrp" />
+		<result column="COM_CODE_NM" property="comCodeNm" />
+		<result column="COM_CODE_DESC" property="comCodeDesc" />
+		<result column="USE_YN" property="useYn" />
+		<result column="UPPER_COM_CODE" property="upperComCode" />
+		<result column="COM_CODE" property="comCode" />
+	</resultMap>
+	 
+
+	<select id="selectItemOrderCode" resultMap="comCodeMap" >
+		select *
+		  from tb_com_code
+		 where com_code_grp='ITEM_ORDER'
+	</select>
+	<select id="selectLaundryStatusCode" resultMap="comCodeMap">
+		select *
+		  from tb_com_code
+		 where com_code_grp='ORDER_STATUS' 
+	</select>
+	<select id="selectLaundryCategory" resultMap="comCodeMap">
+		select *
+		  from tb_com_code
+		 where com_code_grp='LAUNDRY_CATEGORY' 
+	</select>
+	<select id="selectComCodeByComCodeGrp" resultMap="comCodeMap">
+	select *
+		  from tb_com_code
+		 where com_code_grp=#{comCodeGrp} 
+	</select>
+	<select id="selectComCodeByUpperComCode" resultMap="comCodeMap">
+	select *
+		  from tb_com_code
+		 where upper_com_code=#{upperComCode} 
+	</select>
+	
+	<select id="getDepartment" resultMap="comCodeMap">
+		SELECT *
+		FROM TB_COM_CODE
+		WHERE COM_CODE_GRP = 'DEPARTMENT'
+	</select>
+	
+	<select id="getPosition" resultMap="comCodeMap">
+		SELECT *
+		FROM TB_COM_CODE
+		WHERE COM_CODE_GRP = 'POSITION'
+	</select>
+	
+	
+	
+	
+
+</mapper>

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- orderGoods.picture --> 
+	<bean id="picturePath" class="java.lang.String">
+		<constructor-arg value="${orderGoods.picture.upload}" />      
+	</bean>
+	
+	<!-- orderGoods.picture --> 
+	<bean id="deliveryPath" class="java.lang.String">
+		<constructor-arg value="${delivery.picture.upload}" />      
+	</bean>
+	
+	<!-- board.file -->
+	<bean id="boardPath" class="java.lang.String">
+		<constructor-arg value="${board.upload}" />      
+	</bean>
+	
+	
+	<!-- 문자알림  -->
+	<bean id="sensSms" class="com.rundering.util.SensSms" />
+	 
+	<!-- Repository Layer -->
+	<bean id="asRequestDAO" class="com.rundering.dao.AsRequestDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="memberDAO" class="com.rundering.dao.MemberDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="menuDAO" class="com.rundering.dao.MenuDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="laundryArticlesDAO" class="com.rundering.dao.LaundryArticlesDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="laundryFixturesDAO" class="com.rundering.dao.LaundryFixturesDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="laundryItemsDAO" class="com.rundering.dao.LaundryItemsDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="suggestDAO" class="com.rundering.dao.SuggestDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="faqDAO" class="com.rundering.dao.FAQDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="employeesDAO" class="com.rundering.dao.EmployeesDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="attachDAO" class="com.rundering.dao.AttachDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="noticeDAO" class="com.rundering.dao.NoticeDAOImpl"
+		p:session-ref="sqlSession"	
+	/>
+	<bean id="itemOrderDAO" class="com.rundering.dao.ItemOrderDAOImpl"
+		p:session-ref="sqlSession" 
+	/>
+	<bean id="comCodeDAO" class="com.rundering.dao.ComCodeDAOImpl"
+	 	p:session-ref="sqlSession"
+	/>
+	<bean id="deliveryDAO" class="com.rundering.dao.DeliveryDAOImpl"
+	 	p:session-ref="sqlSession"
+	/>
+	<bean id="replyDAO" class="com.rundering.dao.ReplyDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="laundryOrderDAO" class="com.rundering.dao.LaundryOrderDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="laundryOrderDetailDAO" class="com.rundering.dao.LaundryOrderDetailDAOImpl"
+		p:session-ref="sqlSession"
+	/>
+	<bean id="memberAddressDAO" class="com.rundering.dao.MemberAddressDAOImpl"
+		p:session-ref="sqlSession"	
+	/>
+	<bean id="branchDAO" class="com.rundering.dao.BranchDAOImpl"
+		p:session-ref="sqlSession"	
+	/>
+	 <bean id="adminItemOrderDAO" class="com.rundering.dao.AdminItemOrderDAOImpl"
+		p:session-ref="sqlSession" 
+	 />
+	 <bean id="laundryThroughputDAO" class="com.rundering.dao.LaundryThroughputDAOImpl"
+	 	p:session-ref="sqlSession"	
+	 />
+	 <bean id="branchApplicationDAO" class="com.rundering.dao.BranchApplicationDAOImpl"
+	 	p:session-ref="sqlSession"
+	 />
+	 <bean id="LaundryGoodsStockDAO" class="com.rundering.dao.LaundryGoodsStockDAOImpl"
+	 	p:session-ref="sqlSession"
+	 />
+	 <bean id="notificationDAO" class="com.rundering.dao.NotificationDAOImpl"
+	 	p:session-ref="sqlSession"
+	 />
+	 <bean id="itemInsertDAO" class="com.rundering.dao.ItemInsertDAOImpl"
+	 	p:session-ref="sqlSession"
+	 />
+	 <bean id="itemOutDAO" class="com.rundering.dao.ItemOutDAOImpl" 
+	 	p:session-ref="sqlSession"
+	 />
+	 
+
+	<!-- Service Layer -->
+	<bean id="asRequestService" class="com.rundering.service.AsRequestServiceImpl"
+		p:asRequestDAO-ref="asRequestDAO"
+		p:branchDAO-ref="branchDAO"
+		p:employeesDAO-ref="employeesDAO"
+		p:notificationDAO-ref="notificationDAO"
+		p:laundryFixturesDAO-ref="laundryFixturesDAO"
+	/>	
+	<bean id="menuService" class="com.rundering.service.MenuServiceImpl"
+		p:menuDAOBean-ref="menuDAO"
+	/>	
+	<bean id="laundryArticlesService" class="com.rundering.service.LaundryArticlesServiceImpl"
+		p:laundryArticlesDAO-ref="laundryArticlesDAO"
+		p:attachDAO-ref="attachDAO"
+		p:comCodeDAO-ref="comCodeDAO"
+		p:laundryGoodsStockDAO-ref="LaundryGoodsStockDAO"
+		p:branchDAO-ref="branchDAO"
+	/>	
+	<bean id="laundryFixturesService" class="com.rundering.service.LaundryFixturesServiceImpl"
+		p:laundryFixturesDAO-ref="laundryFixturesDAO"
+	/>	
+	<bean id="laundryItemsService" class="com.rundering.service.LaundryItemsServiceImpl"
+		p:laundryItemsDAO-ref="laundryItemsDAO" 
+		p:comCodeDAO-ref="comCodeDAO"
+	/>
+	<bean id="suggestService" class="com.rundering.service.SuggestServiceImpl"
+		p:suggestDAO-ref="suggestDAO"
+		p:branchDAO-ref="branchDAO"
+		p:employeesDAO-ref="employeesDAO"
+		p:notificationDAO-ref="notificationDAO"
+	/>	
+	<bean id="faqService" class="com.rundering.service.FAQServiceImpl"
+		p:faqDAO-ref="faqDAO"
+		p:memberDAO-ref="memberDAO"
+		p:sensSms-ref="sensSms"
+	/>	
+	<bean id="memberService" class="com.rundering.service.MemberServiceImpl"
+		p:memberDAO-ref="memberDAO"
+		p:branchDAO-ref="branchDAO"
+		p:employeesDAO-ref="employeesDAO"
+		p:notificationDAO-ref="notificationDAO"
+	/>
+	<bean id="employeesService" class="com.rundering.service.EmployeesServiceImpl"
+		p:employeesDAO-ref="employeesDAO" 
+		p:memberDAO-ref="memberDAO" 
+		p:comCodeDAO-ref="comCodeDAO"
+		p:branchDAO-ref="branchDAO"
+	/>
+	<bean id="noticeService" class="com.rundering.service.NoticeServiceImpl" 
+		p:noticeDAO-ref="noticeDAO"
+		p:replyDAO-ref="replyDAO"
+		p:branchDAO-ref="branchDAO"
+		p:employeesDAO-ref="employeesDAO"
+		p:notificationDAO-ref="notificationDAO"
+	/>
+	<bean id="itemOrderService" class="com.rundering.service.ItemOrderServiceImpl"
+		p:itemOrderDAO-ref="itemOrderDAO"
+		p:comCodeDAO-ref="comCodeDAO"
+		p:itemInsertDAO-ref="itemInsertDAO"
+		p:laundryGoodsStockDAO-ref="LaundryGoodsStockDAO"
+	/>
+	<bean id="attachService" class="com.rundering.service.AttachService"
+		p:attachDAO-ref="attachDAO"
+	/>
+	<bean id="deliveryService" class="com.rundering.service.DeliveryServiceImpl"
+		p:laundryOrderDAO-ref="deliveryDAO"
+		p:attachDAO-ref="attachDAO"
+		p:memberDAO-ref="memberDAO" 
+		p:sensSms-ref="sensSms"
+	/>
+	<bean id="laundryOrderService" class="com.rundering.service.LaundryOrderServiceImpl" 
+		p:laundryItemsDAO-ref="laundryItemsDAO"
+		p:laundryOrderDAO-ref="laundryOrderDAO"
+		p:laundryOrderDetailDAO-ref="laundryOrderDetailDAO"
+		p:replyDAO-ref="replyDAO"
+		p:comCodeDAO-ref="comCodeDAO"
+		p:branchDAO-ref="branchDAO"
+		p:memberDAO-ref="memberDAO"
+		p:attachDAO-ref="attachDAO"
+		p:laundryThroughputDAO-ref="laundryThroughputDAO"
+	/>
+	<bean id="memberAddressService" class="com.rundering.service.MemberAddressServiceImpl" 
+		p:memberAddressDAO-ref="memberAddressDAO"
+	/>
+	<bean id="branchService" class="com.rundering.service.BranchServiceImpl" 
+		p:branchDAO-ref="branchDAO"
+	/>
+	<bean id="replySerivce"  class="com.rundering.service.ReplyServiceImpl" 
+		p:replyDAO-ref="replyDAO"
+		p:memberDAO-ref="memberDAO"
+		p:sensSms-ref="sensSms"
+		p:laundryOrderDAO-ref="laundryOrderDAO"
+	/>
+	<!--이메일 발송 서비스  -->
+	<bean id="mailSendService" class="com.rundering.service.MailSendService"
+	  p:mailSender-ref="mailSender"
+	  p:memberDAO-ref="memberDAO" 
+	/>  
+	<bean id="adminItemOrderService" class="com.rundering.service.AdminItemOrderServiceImpl"
+		p:adminItemOrderDAO-ref="adminItemOrderDAO"
+	/>
+	<bean id="laundryThroughputService" class="com.rundering.service.LaundryThroughputServiceImpl"
+		p:laundryThroughputDAO-ref="laundryThroughputDAO"
+	/>
+	<bean id="branchApplicationService" class="com.rundering.service.BranchApplicationServiceImpl"
+		p:branchApplicationDAO-ref="branchApplicationDAO"
+		p:branchDAO-ref="branchDAO"
+		p:memberDAO-ref="memberDAO"
+		p:laundryFixturesDAO-ref="laundryFixturesDAO"
+		p:laundryArticlesDAO-ref="laundryArticlesDAO"
+		p:laundryGoodsStockDAO-ref="LaundryGoodsStockDAO"
+		p:employeesDAO-ref="employeesDAO"
+		p:mailSendService-ref="mailSendService"
+		p:sensSms-ref="sensSms"
+	 />
+	<bean id="notificationService" class="com.rundering.service.NotificationServiceImpl"
+		p:notificationDAO-ref="notificationDAO"
+		p:comCodeDAO-ref="comCodeDAO"
+	 />
+		 
+	<bean id="itemService" class="com.rundering.service.ItemServiceImpl"
+		p:laundryGoodsStockDAO-ref="LaundryGoodsStockDAO"
+		p:comCodeDAO-ref="comCodeDAO"
+		p:itemInsertDAO-ref="itemInsertDAO"
+		p:laundryArticlesDAO-ref="laundryArticlesDAO"
+		p:itemOutDAO-ref="itemOutDAO"
+	/>
+</beans>

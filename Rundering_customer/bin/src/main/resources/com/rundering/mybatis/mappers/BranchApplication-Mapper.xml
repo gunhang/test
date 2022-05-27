@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BranchApplication-Mapper">
+<resultMap type="branchApplication" id="branchApplicationMap">
+	<result column="APPLICATION_NO" property="applicationNo"/>
+	<result column="APPLICATION_DATE" property="applicationDate"/>
+	<result column="APPLICATE_NAME" property="applicateName"/>
+	<result column="PHONE" property="phone"/>
+	<result column="EMAIL" property="email"/>
+	<result column="LEASECONTRACT_FILE" property="leasecontractFile"/>
+	<result column="APPROVALRETURN_YN" property="approvalreturnYn"/>
+	<result column="APPROVALRETURN_CONTENTS" property="approvalreturnContents"/>
+	<result column="EXAMINATION_YN" property="examinationYn"/>
+	<result column="EXAMINATION_DETAILS" property="examinationDetails"/>
+	<result column="PRIVATECONTRACT_FILE" property="privatecontractFile"/>
+	<result column="CHARGER" property="charger"/>
+	<result column="PROGRESS_STATUS_CODE" property="progressStatusCode"/>
+</resultMap>
+
+
+	<update id="insertBranchApplication" parameterType="branchApplication">
+		INSERT INTO  TB_BRANCH_APPLICATION(
+			APPLICATION_NO
+			,APPLICATION_DATE
+			,APPLICATE_NAME
+			,PHONE
+			,EMAIL
+			,LEASECONTRACT_FILE
+			,PROGRESS_STATUS_CODE
+			) VALUES (
+			APPLICATION_NO_SEQ.nextval
+			,SYSDATE
+			,#{applicateName}
+			,#{phone}
+			,#{email}
+			,#{leasecontractFile}
+			,'01'
+			)
+	</update>
+	
+	<select id="selectSelfAuthentification" resultMap="branchApplicationMap" parameterType="branchApplication">
+		select  *
+		from TB_BRANCH_APPLICATION
+		WHERE APPLICATE_NAME = #{applicateName}
+		AND PHONE = #{phone}
+	</select> 
+	
+	<update id="updateJudge" parameterType="branchApplication">
+		UPDATE TB_BRANCH_APPLICATION
+		<if test="progressStatusCode == '03'.toString() ">
+			set PROGRESS_STATUS_CODE = '04'
+		</if>
+		<if test="progressStatusCode == '06'.toString() ">
+			set PROGRESS_STATUS_CODE = '07'
+		</if>
+		<if test="progressStatusCode == '08'.toString() ">
+			set PROGRESS_STATUS_CODE = '09'
+		</if>
+		where APPLICATION_NO = #{applicationNo}
+		and PROGRESS_STATUS_CODE = #{progressStatusCode}
+	</update>
+	
+	
+</mapper>

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Member-Mapper">
+
+	<resultMap type="member" id="memberMap">
+		<result column="MEMBERNO" property="memberNo" />
+		<result column="ID" property="id" />
+		<result column="PASSWORD" property="password" />
+		<result column="NAME" property="name" />
+		<result column="PHONE" property="phone" />
+		<result column="EMAIL" property="email" />
+		<result column="REGIST_DATE" property="registDate" />
+		<result column="MODIFY_DATE" property="modifyDate" />
+		<result column="ENABLE_WHETHER" property="enableWhether" />
+		<result column="DELETE_YN" property="deleteYn" />
+		<result column="LASTLOGPSNHOURLIVER" property="lastLogpsnHourLiver" />
+		<result column="LOGINFAIL_COUNT" property="loginfailCount" />
+		<result column="EMPLOYEE_ID_YN" property="employeeIdYn" />
+	</resultMap>
+
+	<select id="selectEmployeeById" resultMap="memberMap" parameterType="str">
+		select *
+		from TB_MEMBER
+		where id=#{id}
+		and EMPLOYEE_ID_YN='Y'
+	</select>
+
+	<select id="selectMemberByMemberNo" resultMap="memberMap" parameterType="str">
+		select *
+		from TB_MEMBER
+		where MEMBERNO=#{memberNo}
+	</select>
+	
+	<select id="selectMemberById" resultMap="memberMap" parameterType="str">
+		select *
+		from TB_MEMBER
+		where id=#{id}
+	</select>
+
+	<select id="selectAuthByMemberNo" resultType="str" parameterType="str">
+		select AUTH_GRP_CODE
+		  from TB_USER_AUTH
+		 where MEMBERNO=#{memberNo} 
+	</select>
+
+	<select id="getMemberById" resultMap="memberMap" parameterType="str">
+		select *
+		from TB_MEMBER
+		where id is null
+		and phone=#{phone}
+	</select>
+
+	<select id="getEmpAppinfo" resultMap="memberMap" parameterType="str">
+		SELECT *
+		FROM TB_MEMBER
+		WHERE MEMBERNO = #{memberNo}
+	</select>
+	
+	<select id="getemplapplist" resultMap="memberMap" parameterType="str">
+		SELECT *
+	      FROM TB_MEMBER
+	     WHERE ID IS NULL
+	     and
+	     password= #{password} 
+	</select>
+
+	<select id="applistCount" resultType="int" parameterType="str">
+		select
+		count(*)
+		FROM
+		TB_MEMBER
+		WHERE ID IS NULL
+		AND PASSWORD = #{password}
+	</select>	
+	<update id="applicationEmployee" parameterType="member">
+		INSERT INTO
+		TB_MEMBER(MEMBERNO,PASSWORD,NAME,PHONE,EMAIL)
+		VALUES
+		(MEMBERNO_SEQ.NEXTVAL,#{password},#{name},#{phone},#{email})
+	</update>
+	<update id="updatemplmem" parameterType="member">
+		UPDATE
+		TB_MEMBER
+		SET
+		ID = #{id}
+		,PASSWORD = #{password}
+		,EMPLOYEE_ID_YN = 'Y'
+		where MEMBERNO = #{memberNo}
+	</update>
+	
+	<update id="removeByNo" parameterType="str">
+		DELETE 
+		FROM TB_MEMBER
+		WHERE MEMBERNO = #{MEMBERNO}
+	</update>
+	
+	<select id="getPhoneNum" parameterType="str" resultType="str">
+		select phone 
+        from TB_MEMBER
+        where MEMBERNO = #{memberNo}
+	</select>
+		
+	<select id="selectMemberList" resultType="member">
+		select 
+		*
+		from TB_MEMBER
+		order by regDate desc 		
+	</select>
+	
+	<select id="selectMemberListCount" resultType="int" >
+		select
+		count(*)
+		from TB_MEMBER
+		order by regDate desc
+	</select>
+	
+	<sql id="searchSort">	
+		<if test="customerSort == '01'.toString()">
+		</if>
+		<if test="customerSort == '0'.toString()">
+			AND ENABLE_WHETHER like '0'		
+		</if>
+		<if test="customerSort == 'Y'.toString()">
+			AND DELETE_YN like 'Y'		
+		</if>
+	</sql>	
+	
+	<sql id="search">	
+		<if test="searchType == 't'.toString()">
+			AND memberNo like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			AND name like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'tc'.toString()">
+			AND (
+			memberNo like '%'||#{keyword}||'%'
+			or
+			name like '%'||#{keyword}||'%'						
+			)			
+		</if>
+	</sql>	
+	
+	
+	
+	<select id="selectSearchMemberList"  resultMap="memberMap">
+		select
+		* 
+		from TB_MEMBER
+		where memberNo is not null
+		<include refid="searchSort" />
+		<include refid="search" />
+		AND EMPLOYEE_ID_YN = 'N'
+		
+		 
+	</select>
+	<select id="selectSearchMemberListCount" resultType="int">
+		select
+		count(*) 
+		from TB_MEMBER
+		where memberNo is not null
+		<include refid="searchSort" />
+		<include refid="search" />
+		AND EMPLOYEE_ID_YN = 'N'
+	</select>
+	
+	
+	<update id="modifyPwById" parameterType="member">
+		UPDATE
+		TB_MEMBER
+		SET
+		PASSWORD = #{password}
+		WHERE ID = #{id}
+	</update>
+	
+	<select id="selectMemberNoSeq" resultType="str">
+		select MEMBERNO_SEQ.NEXTVAL
+		  from dual
+	</select>
+	
+	<insert id="insertBranchMemberByMemberVO" parameterType="member">
+		INSERT INTO
+		TB_MEMBER(MEMBERNO,PASSWORD,NAME,PHONE,EMAIL)
+		VALUES
+		(#{memberNo},'03',#{name},#{phone},#{email})
+	</insert>
+	
+	<select id="selectMemberByPhone" parameterType="str" resultMap="memberMap">
+		select *
+		  from tb_member
+		 where phone=#{phone}
+	
+	</select>
+	 
+</mapper>

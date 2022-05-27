@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Notification-Mapper">
+
+	<resultMap type="notification" id="notificationMap">
+		<result column="NTCNID" property="ntcnId" />
+		<result column="CNFIRMAT" property="cnfirmat" />
+		<result column="NTCNKND" property="ntcnknd" />
+		<result column="NTCNCN" property="ntcncn" />
+		<result column="NTCNCLICKHOUR_URL" property="ntcnclickhourUrl" />
+		<result column="OCCRRNCDEHOUR" property="occrrncdehour" />
+		<result column="CNFIRMDEHOUR" property="cnfirmdehour" />
+		<result column="EMPLOYEE_ID" property="employeeId" />
+	</resultMap>
+	
+	
+	<select id="selectNotificationSequenceNextValue" resultType="int">
+		SELECT NTCNID_SEQ.nextval FROM DUAL
+	</select>
+	
+	<update id="insertNotification" parameterType="notification">
+		INSERT INTO TB_NOTIFICATION
+			(NTCNID,NTCNKND,NTCNCN,NTCNCLICKHOUR_URL,EMPLOYEE_ID)
+		VALUES (#{ntcnId},#{ntcnknd},#{ntcncn},#{ntcnclickhourUrl},#{employeeId})
+	</update>
+	
+	<select id="selectNotificationListByEmployeeId" parameterType="str" resultMap="notificationMap">
+		SELECT * FROM TB_NOTIFICATION
+		WHERE CNFIRMAT = 'N'
+		 AND EMPLOYEE_ID = #{employeeId}
+		 ORDER BY OCCRRNCDEHOUR DESC
+	</select>
+	
+	<update id="updateCheckedNotification" parameterType="str">
+		UPDATE TB_NOTIFICATION
+		  SET CNFIRMAT = 'Y',
+		  	  CNFIRMDEHOUR = SYSDATE
+		 WHERE NTCNID=#{ntcnId} 
+	</update>
+	
+	<update id="updateCheckedAllNotification" parameterType="str">
+		UPDATE TB_NOTIFICATION
+		  SET CNFIRMAT = 'Y',
+		  	  CNFIRMDEHOUR = SYSDATE
+		 WHERE EMPLOYEE_ID = #{employeeId}
+		  AND CNFIRMAT = 'N'
+	</update>
+
+
+</mapper>

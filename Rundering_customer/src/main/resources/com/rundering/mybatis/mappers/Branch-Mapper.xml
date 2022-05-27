@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Branch-Mapper">
+
+	<resultMap type="branch" id="branchMap">
+		<result column="BRANCH_CODE" property="branchCode" /> 	
+		<result column="BRANCH_NAME" property="branchName" />
+		<result column="ZIP" property="zip" />
+		<result column="ADD1" property="add1" />	
+		<result column="ADD2" property="add2" />	
+		<result column="BRANCH_LNDRPCRYMSLMCOQY" property="branchLndrpcrymslmcoqy" />
+		<result column="BRANCH_REGIST_DATE" property="branchRegistDate" />
+		<result column="BRANCH_CONTACT" property="branchContact" />
+		<result column="BRANCH_MODIFY_DATE" property="branchModifyDate" />
+		<result column="DELETE_YN" property="deleteYN" />
+		<result column="TOPAREA" property="toparea" />
+		<result column="AREA" property="area" />
+	</resultMap>
+
+	<select id="selectBranchList" resultMap="branchMap" >
+		SELECT *
+		FROM TB_BRANCH
+	</select>
+
+	<select id="selectAvailableBranchList" resultMap="branchMap" >
+		SELECT *
+		FROM TB_BRANCH
+		WHERE DELETE_YN = 'N'
+	</select>
+	
+	<select id="selectBranchByBranchCode" resultMap="branchMap" parameterType="str">
+		SELECT *
+		FROM TB_BRANCH
+		WHERE BRANCH_CODE = #{branchCode}
+	</select>
+	
+	<select id="selectBranchListByArea" resultMap="branchMap" parameterType="str">
+		SELECT *
+		FROM TB_BRANCH
+		WHERE AREA = #{area}
+		 AND DELETE_YN = 'N'
+	</select>
+	
+	<select id="getBranchByCode" resultMap="branchMap" parameterType="str">
+		SELECT *
+    	FROM TB_BRANCH
+    	WHERE BRANCH_CODE = #{branchCode}
+	</select>
+	
+	<select id="selectExcessCapacityOfTodayLaundryByArea" parameterType="str" resultType="int">
+		SELECT A.SUMBRANCH_LNDRPCRYMSLMCOQY - B.CNTORDER
+	         FROM (SELECT SUM(BRANCH_LNDRPCRYMSLMCOQY) AS SUMBRANCH_LNDRPCRYMSLMCOQY
+	                FROM TB_BRANCH
+	               WHERE AREA= #{area}
+	               DELETE_YN = 'N') A,
+	              (SELECT COUNT(*) AS CNTORDER
+	                  FROM TB_LAUNDRY_ORDER
+	                 WHERE BRANCH_CODE LIKE #{area}||'%'
+	                  AND ORDER_STATUS = '01'
+	                  AND PICKUP_REQUEST_DATE = TO_CHAR(SYSDATE, 'YYYY/MM/DD')) B
+	</select>
+	
+	<select id="selectExcessCapacityOfTodayLaundryByBranchCode" parameterType="str" resultType="int">
+		SELECT A.SUMBRANCH_LNDRPCRYMSLMCOQY - B.CNTORDER
+         FROM (SELECT BRANCH_LNDRPCRYMSLMCOQY AS SUMBRANCH_LNDRPCRYMSLMCOQY
+                FROM TB_BRANCH
+               WHERE BRANCH_CODE = #{branchCode}) A,
+              (SELECT COUNT(*) AS CNTORDER
+              FROM TB_LAUNDRY_ORDER
+             WHERE BRANCH_CODE = #{branchCode}
+              AND PICKUP_REQUEST_DATE = TO_CHAR(SYSDATE, 'YYYY/MM/DD')
+              AND ORDER_STATUS = '01') B
+	</select>
+	
+	<select id="selectBranchCodeByArea" parameterType="str" resultType="str">
+		SELECT branch_code
+		  FROM (
+		         SELECT branch_code
+		           FROM tb_branch
+		          ORDER BY branch_code DESC
+		       )
+		 WHERE <![CDATA[
+					ROWNUM  <= 1
+			 	]]>
+		   and branch_code like '%'||#{area}||'%'
+	</select>
+	<insert id="insertBranch" parameterType="branch">
+		insert into tb_branch
+		   (
+		   BRANCH_CODE,
+		   BRANCH_NAME,
+		   ZIP,
+		   BRANCH_LNDRPCRYMSLMCOQY,
+		   BRANCH_CONTACT,
+		   TOPAREA,
+		   ADD1,
+		   ADD2,
+		   AREA
+		   )
+			values(
+			#{branchCode},
+			#{branchName},
+			#{zip},
+			#{branchLndrpcrymslmcoqy},
+			#{branchContact},
+			#{toparea},
+			#{add1},
+			#{add2},
+			#{area}
+			)
+	
+	</insert>
+
+</mapper>

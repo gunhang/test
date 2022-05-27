@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AsRequest-mapper">
+
+	<!-- 언더바컬럼재정의 -->
+	<resultMap type="asRequest" id="asRequestMap">
+	
+		<result column="ASNO" property="asno" />
+		<result column="FIXTURES_CODE" property="fixturesCode" />
+		<result column="TITLE" property="title" />
+		<result column="ASCONTENT" property="ascontent" />
+		<result column="REGIST_DATE" property="registDate" />
+		<result column="CHECKYN" property="checkyn" />
+		<result column="MODIFY_DATE" property="modifyDate" />
+		<result column="DELETEYN" property="deleteyn" />
+		<result column="EMPLOYEE_ID" property="employeeId" />
+		<result column="BRANCH_CODE" property="branchCode" />
+		<result column="ARTICLES_CODE" property="articlesCode" />
+		<result column="REQUEST_DATE" property="requestDate" />
+	
+	</resultMap>
+	
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and b.title like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and b.ascontent like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and c.name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'b'.toString()">
+			and d.branch_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'k'.toString()">
+			and b.checkyn like '%'||#{keyword}||'%'
+		</if>
+		
+		<if test="searchType == 'tcwbk'.toString()">
+			and (
+			b.title like '%'||#{keyword}||'%'
+			or
+			b.ascontent like '%'||#{keyword}||'%'
+			or
+			c.name like '%'||#{keyword}||'%'
+			or
+			d.branch_name like '%'||#{keyword}||'%'			
+			or
+			b.checkyn like '%'||#{keyword}||'%'			
+			)			
+		</if>
+	</sql>
+	
+	<!-- 리스트보기 -->
+	<select id="selectSearchAsRequestList" resultMap="asRequestMap" >
+		select
+		    b.asno,
+		    f.fixtures_code,
+		    e.articles_name as objectname,
+		    b.title,
+		    b.ascontent,
+		    c.name as employee_id,   
+		    d.branch_name as branch_code,
+		    b.regist_date,
+		    b.articles_code,
+		    b.request_date,
+		    b.checkyn
+		from tb_employees a, tb_as b, tb_member c, tb_branch d, tb_laundry_articles e, tb_laundry_fixtures f
+		    where a.employee_id = b.employee_id
+		      and a.memberno = c.memberno
+		      and b.branch_code = d.branch_code
+		      and b.fixtures_code = f.fixtures_code
+		      and b.articles_code = e.articles_code
+		      and b.deleteyn='N'
+		      <include refid="search" />
+		 order by b.asno desc
+	</select>
+	 
+	<select id="selectSearchAsRequestListCount" resultType="int">
+		select
+		count(*) 
+		from tb_employees a, tb_as b, tb_member c, tb_branch d, tb_laundry_articles e, tb_laundry_fixtures f
+		    where a.employee_id = b.employee_id
+		      and a.memberno = c.memberno
+		      and b.branch_code = d.branch_code
+		      and b.fixtures_code = f.fixtures_code
+		      and b.articles_code = e.articles_code
+		      and b.deleteyn='N'
+			  and b.asno is not null
+		<include refid="search" />
+		order by b.regist_date desc
+	</select>
+	
+	<select id="selectAsRequestByAsno" parameterType="int" resultMap="asRequestMap" >
+		select b.asno, b.title, b.ascontent, b.regist_date, f.fixtures_name as fixturesName, c.name as employee_id, d.branch_name as branch_code, b.request_date
+	    from tb_employees a, tb_as b, tb_member c, tb_branch d, tb_laundry_articles e, tb_laundry_fixtures f
+	    where asno=#{asno}
+	    	and a.employee_id = b.employee_id
+	    	and a.memberno = c.memberno
+	    	and b.branch_code = d.branch_code
+	        and b.fixtures_code = f.fixtures_code
+	        and b.articles_code = e.articles_code
+	</select>
+	
+	<!-- 조회수 -->
+	<!-- <update id="increaseViewCount" parameterType="int">
+		update tb_as
+			set viewcnt=viewcnt+1
+			where asno=#{asno}
+	</update> -->
+	
+	<!-- 확인미확인 -->
+	<update id="checkAsRequest" parameterType="asRequest">
+		update tb_as
+			set
+			checkyn = '확인'
+			where asno=#{asno}
+			and checkyn = '미확인'
+	</update>
+	
+	<update id="okAsRequest" parameterType="asRequest">
+		update tb_as
+			set
+			checkyn = '조치완료'
+			where asno=#{asno}
+	</update>
+	
+	<!-- 글번호 -->
+	<select id="selectAsRequestSequenceNextValue" resultType="int">
+		select asno_seq.nextVal
+			from dual
+	</select>
+	
+	<!-- 삽입 -->
+	<select id="insertAsRequest" resultType="asRequest">
+		insert into tb_as(
+			asno,
+			title,
+			ascontent,
+			employee_id,
+			branch_code,
+			request_date,			
+			fixtures_code,
+			articles_code
+			) values(
+					asno_seq.nextval,
+					#{title},
+					#{ascontent},
+					#{employeeId},
+					#{branchCode},
+					#{requestDate},
+					#{fixturesCode},
+					#{articlesCode})
+	</select>
+	
+	<!-- 물건리스트 호출 (중복제거)-->
+	<select id="selectItemList" resultType="asRequest">
+        select distinct articles_code
+        from TB_LAUNDRY_FIXTURES
+    </select>
+	
+	<!-- 수정 -->
+	<update id="updateAsRequest" parameterType="asRequest">
+		update tb_as
+		set 
+			title=#{title},ascontent=#{ascontent}, fixtures_code=#{fixturesCode}, request_date=#{requestDate}
+		where asno=#{asno}
+	</update>
+	
+	<!-- 삭제 -->
+	<update id="deleteAsRequest" parameterType="int" >
+		delete
+		from tb_as
+		where asno=#{asno}		
+	</update>
+
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="ItemOut-Mapper">
+  <resultMap type="itemOut" id="itemOutMap">
+		<result column="ARTICLES_CODE"  property="articlesCode"/>
+		<result column="INSERT_DATE"  property="insertDate"/>
+		<result column="ITEM_COUNT"  property="itemCount"/>
+		<result column="BRANCH_CODE"  property="branchCode"/>
+		<result column="ORDER_NO"  property="orderNo"/>
+	</resultMap>
+	
+	
+	<select id="selectItemOutList" resultMap="itemOutMap">
+		select *
+		  from tb_item_out
+		 where branch_code=#{branchCode}
+		 ORDER BY out_date ASC 
+		   
+	</select>
+	
+	<select id="selectItemOutCount" resultType="int" >
+		select count(*)
+		  from tb_item_out
+		 where branch_code=#{branchCode}
+		 ORDER BY out_date ASC 
+		    
+	</select>
+	
+	<insert id="insertItemOut" parameterType="itemOut">
+	insert into tb_item_out
+	(
+	OUT_ITEM_CODE,
+	ARTICLES_CODE,
+	BRANCH_CODE,
+	ITEMCOUNT
+	)values(
+		item_order_seq.nextval,
+		#{articlesCode},
+		#{branchCode},
+		#{itemcount}
+	)
+	</insert>
+	<delete id="deleteItemOut" parameterType="str">
+		DELETE FROM tb_item_out
+		 WHERE out_item_code=#{outItemCode}
+		
+	</delete>		
+	
+	
+	
+	
+	
+	</mapper>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="AdminItemOrder-mapper">
+
+	<!-- 언더바컬럼재정의 -->
+	<resultMap type="itemOrder" id="itemOrderMap">
+		<result column="ORDERCODE" property="ordercode"/>
+		<result column="ITEM_ORDER_PAYMENT_PRICE" property="itemOrderPaymentPrice"/>
+		<result column="ITEM_ORDER_STATUS" property="itemOrderStatus"/>
+		<result column="CHARGER" property="charger"/>
+		<result column="BRANCH_CODE" property="branchCode"/>
+		<result column="REGIST_DATE" property="registDate"/>
+		<result column="RECEIPT_DATE" property="receiptDate"/>
+	</resultMap>
+	
+	<resultMap type="itemOrderDetail" id="itemOrderDetailMap">
+		<result column="ORDERCODE" property="ordercode"/>
+		<result column="ARTICLES_CODE" property="articlesCode"/>
+		<result column="SEQ" property="seq"/>
+		<result column="ORDER_COUNT" property="orderCount"/>
+	</resultMap>
+	
+	<select id="selectSearchItemOrder" parameterType="itemOrder" resultMap="itemOrderMap">
+		select *
+		  from TB_ITEM_ORDER
+	</select>
+	
+	<select id="selectSearchItemOrderCount" resultType="int">
+		select
+		 count(*) 
+		  from TB_ITEM_ORDER
+	</select>
+	
+	<select id="selectItemOrderDetailByOrderCode" parameterType="itemOrder" resultMap="itemOrderMap">
+		select 
+			A.ORDERCODE
+			, A.ITEM_ORDER_PAYMENT_PRICE
+			, A.ITEM_ORDER_STATUS
+			, A.CHARGER
+			, B.BRANCH_NAME as branchName
+			, A.REGIST_DATE
+			, A.RECEIPT_DATE
+		  from TB_ITEM_ORDER A, TB_BRANCH B
+		 where A.ORDERCODE=#{ordercode} 
+		   and A.BRANCH_CODE=B.BRANCH_CODE
+	</select>
+	
+	<select id="selectItemOrderDetail" parameterType="itemOrderDetail" resultMap="itemOrderDetailMap">
+		select 
+		    B.ARTICLES_NAME as articlesName,
+		    A.ORDER_COUNT,
+		    A.ARTICLES_CODE,
+		    B.PRICE*A.ORDER_COUNT as price
+		  from TB_ITEM_ORDER_DETAIL A, TB_LAUNDRY_ARTICLES B
+		 where A.ARTICLES_CODE=B.ARTICLES_CODE
+		   and A.ORDERCODE=#{ordercode}
+	</select>
+	
+	<update id="modifyStatus">
+		update TB_ITEM_ORDER
+		   set 
+		  ITEM_ORDER_STATUS=#{itemOrderStatus}
+		 where ORDERCODE=#{ordercode}	
+	</update>
+</mapper>

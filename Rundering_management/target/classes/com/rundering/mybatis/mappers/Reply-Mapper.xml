@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="Reply-Mapper">
+ 	<resultMap type="reply" id="replyMap">
+ 		<result column="REPLYNO" 		property="replyno" />
+ 		<result column="REPLY_CONTENT"  property="replyContent" />
+ 		<result column="MEMBERNO" 		property="memberno" />
+ 		<result column="REGIST_DATE" 	property="registDate" />
+ 		<result column="MODIFY_DATE" 	property="modifyDate" />
+ 		<result column="REPLYNO_SEQ" 	property="replynoSeq" />
+ 		<result column="ATCH_FILE_NO"	property="atchFileNo" />
+ 		<result column="DELETE_YN"		property="deleteYn" />
+ 	
+ 	</resultMap>
+ 	<select id="selectReplyByReplyNo" resultMap="replyMap">
+ 		select *
+ 		  from TB_REPLY
+ 		 where replyno=#{replyno}
+ 		   and delete_yn = 'N'
+ 		 order by regist_date asc 
+ 	</select>
+ 	<select id="selectReplyCountByReplyno" resultType="int">
+ 		select count(replyno_seq)
+ 		  from tb_reply
+ 		 where replyno=#{replyno}
+ 		   and delete_yn = 'N'
+ 	</select>
+ 	
+ 	<select id="selectReplyCheckByReplyno"  parameterType="int" resultType="int">
+ 		select count(replyno)
+ 		  from tb_reply
+ 		 where replyno=#{replyno}
+ 	</select>
+ 	
+ 	
+ 	<select id="selectReplySeq" resultType="int">
+ 		select replyno_seq.nextval
+ 		  from dual
+ 	</select>
+ 	
+ 	
+ 	
+ 	<insert id="insertReplyByReplyVO" parameterType="reply">
+ 		insert into tb_reply
+ 		(REPLYNO,
+ 	     REPLY_CONTENT,
+ 	     MEMBERNO,
+ 	     REPLYNO_SEQ
+ 		)
+ 		select #{replyno},
+		 			   #{replyContent},
+		 			   #{memberno},
+		 			   <if test="count == 0">
+		 			  	1
+		 			  	from dual
+		 			   </if>
+		 			   <if test="count > 0">
+		 			    max(replyno_seq)+1
+		 			      from tb_reply
+		 			  where replyno=#{replyno}
+		 		
+		 			   </if>
+ 	</insert>
+ 	
+ 
+ 	
+ 	
+	<select id="selectReplySeqNextValue" resultType="int" >
+		select TB_REPLY_seq.nextval
+		from dual		
+	</select>
+	
+	<select id="selectReplyList" resultType="reply">
+		select *
+		from TB_REPLY
+		where REPLYNO=#{replyno}
+		order by replyno asc
+	</select>
+	
+	<update id="insertReply" >
+		insert into TB_REPLY(replyno,replyContent,memberno)
+		values(#{replyno},#{replyContent},#{memberno})
+	</update>
+	
+	<update id="updateReply" parameterType="reply">
+		update TB_REPLY
+		set
+		reply_content=#{replyContent},
+		modify_date=sysdate
+		where replyno=#{replyno}	
+		  and replyno_seq=#{replynoSeq}	
+	</update>
+	
+	<update id="deleteReply" parameterType="int">
+		update TB_REPLY
+		set delete_yn='Y' 
+		where replyno=#{replyno}	
+		  and replyno_seq=#{replynoSeq}	
+	</update>	
+ 
+ </mapper>

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="LaundryOrder-Mapper">
+	
+	<resultMap type="laundryOrder" id="laundryOrderMap">
+		<result column="ORDER_NO" 		 property="orderNo" />
+		<result column="REQUEST_DETAILS" property="requestDetails" />
+		<result column="ORDER_DATE"      property="orderDate" />
+		<result column="CONTACT_NUMBER"  property="contactNumber" />
+		<result column="DELIVERY_REQUEST_DATE" property="deliveryRequestDate" />
+		<result column="TOTAL_PRICE" property="totalPrice" />
+		<result column="PICKUP_REQUEST_DATE" property="pickupRequestDate" />
+		<result column="PICKUP_DATE" property="pickupDate" />
+		<result column="BRANCH_ARRIVAL_DATE" property="branchArrivalDate" />
+		<result column="AREA" property="area" />
+		<result column="DELIVERY_DATE" property="deliveryDate" />
+		<result column="ORDER_STATUS" property="orderStatus" />
+		<result column="CANCEL_YN" property="cancelYn" />
+		<result column="PAYMENTNO" property="paymentNo" />
+		<result column="BRANCH_CODE" property="branchCode" />
+		<result column="MEMBERNO" property="memberNo" />
+		<result column="DELIVERY_EMPLOYEE_ID" property="deliveryEmployeeId" />
+		<result column="PICKUP_EMPLOYEE_ID" property="pickupEmployeeId" />
+		<result column="ZIP" property="zip" />
+		<result column="ADD1" property="add1" />
+		<result column="ADD2" property="add2" />
+		<result column="ATCH_FILE_NO" property="atchFileNo" />
+		<result column="REPLYNO" property="replyNo" />
+	</resultMap>
+	
+	<sql id="search">
+		<if test="searchType == '01'.toString()">
+			and order_status = '01'		
+		</if>
+		<if test="searchType == '02'.toString()">
+			and order_status = '02'			
+		</if>
+		<if test="searchType == '03'.toString()">
+			and order_status = '03'		
+		</if>
+		<if test="searchType == '04'.toString()">
+			and order_status = '04'		
+		</if>
+		<if test="searchType == '05'.toString()">
+			and order_status = '05'		
+		</if>
+		<if test="searchType == '06'.toString()">
+			and order_status = '06'		
+		</if>
+		<if test="searchType == '07'.toString()">
+			and order_status = '07'		
+		</if>
+		<if test="searchType == '08'.toString()">
+			and order_status = '08'		
+		</if>
+		<if test="searchType == '09'.toString()">
+			and order_status = '09'		
+		</if>
+		<if test="searchType == '10'.toString()">
+			and order_status = '10'		
+		</if>
+	</sql>
+	
+	<sql id="searchOrderStatus">
+		<if test="orderStatus!=null and orderStatus.contains('01')">
+			and order_status = '01'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.startsWith('02')">
+			and order_status = '02'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.contains(',02')">
+			or order_status = '02'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.startsWith('03')">
+			and order_status = '03'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.contains(',03')">
+			or order_status = '03'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.startsWith('04')">
+			and order_status = '04'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.contains(',04')">
+			or order_status = '04'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.startsWith('05')">
+			and order_status = '05'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.contains(',05')">
+			or order_status = '05'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.startsWith('06')">
+			and order_status = '06'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.contains(',06')">
+			or order_status = '06'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.startsWith('07')">
+			and order_status = '07'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.contains(',07')">
+			or order_status = '07'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.startsWith('08')">
+			and order_status = '08'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.contains(',08')">
+			or order_status = '08'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.startsWith('09')">
+			and order_status = '09'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.contains(',09')">
+			or order_status = '09'		
+		</if>
+		<if test="orderStatus!=null and orderStatus == '10'.toString()">
+			and order_status = '10'		
+		</if>
+		<if test="orderStatus!=null and orderStatus.contains(',10')">
+			or order_status = '10'		
+		</if>
+	</sql>
+	
+	<sql id="searchAdminLaundryOrderList">
+		<if test="pickupRequestDate!=null and !pickupRequestDate.equals('')">
+			AND PICKUP_REQUEST_DATE  BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') 
+                                     AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+		</if>
+		<if test="branchCode!=null and !branchCode.equals('') and !branchCode.equals('notAssigned')">
+			AND BRANCH_CODE = #{branchCode}
+		</if>
+		<if test="branchCode!=null and branchCode.equals('notAssigned')">
+			AND BRANCH_CODE IS NULL
+		</if>
+		<if test="area!=null and !area.equals('')">
+			AND AREA = #{area}
+		</if>
+		<if test="orderNo!=null and !orderNo.equals('')">
+			AND ORDER_NO like '%'||#{orderNo}||'%'
+		</if>
+	</sql>
+	
+
+	<select id="selectCount" resultType="int">
+		select count(*)
+		from TB_LAUNDRY_ORDER
+		where ORDER_NO is not null
+		<include refid="search"/>
+		<if test="!branchCode.equals('') and branchCode!=null">
+			and branch_code = #{branchCode}
+		</if>
+		
+	</select>
+	
+	<select id="selectLaundryOrderList" resultMap="laundryOrderMap">
+		select *
+		  from TB_LAUNDRY_ORDER
+		 where ORDER_NO is not null
+		 <if test="!branchCode.equals('') and branchCode!=null">
+			and branch_code = #{branchCode}
+		</if>
+		<include refid="search"/>
+		 order by ORDER_DATE
+		 
+	</select>
+	
+	<select id="selectAdminLaundryOrderList" resultMap="laundryOrderMap">
+		select *
+		  from TB_LAUNDRY_ORDER
+		 where ORDER_NO is not null
+		 <include refid="searchAdminLaundryOrderList"/>
+		 <include refid="searchOrderStatus"/>
+		 order by PICKUP_REQUEST_DATE DESC
+	</select>
+	
+	<select id="selectAdminLaundryOrderListCount" resultType="int">
+		select
+		count(*)
+		  from TB_LAUNDRY_ORDER
+		 where ORDER_NO is not null
+		 <include refid="searchAdminLaundryOrderList"/>
+		 <include refid="searchOrderStatus"/>
+	</select>
+	
+	<update id="updateLaundryOrderStatusByOrderNo" parameterType="laundryOrder" >
+		update TB_LAUNDRY_ORDER
+		   set order_status=#{orderStatus}
+		 where order_no=#{orderNo} 
+	</update>
+	
+	<select id="selectLaundryOrderByOrderNo"  resultMap="laundryOrderMap" parameterType="str">
+		select *
+		  from TB_LAUNDRY_ORDER
+		 where ORDER_NO = #{orderNo}
+	</select>
+	
+	<select id="selectLaundryOrderListNotAssignedToBranchByArea"  resultMap="laundryOrderMap" parameterType="str">
+		SELECT *
+		  FROM TB_LAUNDRY_ORDER
+		 WHERE BRANCH_CODE IS NULL
+		  AND ORDER_STATUS = '01'
+		  AND AREA = #{area}
+          AND PICKUP_REQUEST_DATE = TO_CHAR(SYSDATE, 'YYYY/MM/DD')
+         ORDER BY ORDER_DATE
+	</select>
+	
+	<update id="updateLaundryOrderbranchCode" parameterType="laundryOrder" >
+		UPDATE TB_LAUNDRY_ORDER
+		   SET BRANCH_CODE=#{branchCode}
+		 WHERE ORDER_NO=#{orderNo} 
+	</update>
+	
+	
+	<update id="updateLaundryOrderPickupEmployeeId" parameterType="laundryOrder" >
+		UPDATE TB_LAUNDRY_ORDER
+		   SET PICKUP_EMPLOYEE_ID=#{pickupEmployeeId}
+		 WHERE ORDER_NO=#{orderNo} 
+	</update>
+	
+	<update id="updateLaundryOrderDeliveryEmployeeId" parameterType="laundryOrder" >
+		UPDATE TB_LAUNDRY_ORDER
+		   SET DELIVERY_EMPLOYEE_ID=#{deliveryEmployeeId}
+		 WHERE ORDER_NO=#{orderNo} 
+	</update>
+	
+	<select id="selectLaundryOrderListPickUpRequestDateTodayByBranchCode"  resultMap="laundryOrderMap" parameterType="str">
+		SELECT *
+		  FROM TB_LAUNDRY_ORDER
+		 WHERE BRANCH_CODE = #{branchCode}
+		  AND ORDER_STATUS = '01'
+          AND PICKUP_REQUEST_DATE = TO_CHAR(SYSDATE, 'YYYY/MM/DD')
+         ORDER BY ORDER_DATE
+	</select>
+	
+	<select id="selectCompletedLaundryOrderListByBranchCode"  resultMap="laundryOrderMap" parameterType="str">
+		SELECT *
+		  FROM TB_LAUNDRY_ORDER
+		 WHERE BRANCH_CODE = #{branchCode}
+		  AND ORDER_STATUS = '06'
+         ORDER BY ORDER_DATE
+	</select>
+	
+	
+	<select id="selectLaundryOrderByReplyNo"  resultMap="laundryOrderMap" parameterType="int">
+		SELECT *
+		  FROM TB_LAUNDRY_ORDER
+		 WHERE REPLYNO = #{replyNo}
+	</select>
+	
+
+</mapper>

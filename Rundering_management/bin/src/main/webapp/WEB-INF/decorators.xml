@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<decorators defaultdir="/WEB-INF/decorator">
+
+	<decorator name="adminMain" page="admin_main_decorator.jsp">
+		<pattern>/admin/*</pattern>
+	</decorator>
+	
+	<decorator name="adminDaterangepicker" page="admin_daterange_decorator.jsp">
+		<pattern>/admin/laundryorder/list</pattern>
+	</decorator>
+	
+	<decorator name="branchMain" page="branch_main_decorator.jsp">
+		<pattern>/branch/*</pattern>
+	</decorator>
+	
+	<decorator name="deliveryPage" page="delivery_decorator.jsp">
+		<pattern>/fordelivery/*</pattern>
+	</decorator>
+		
+	<decorator name="openWindow" page="open_decorator.jsp">
+		<pattern>/admin/**/*</pattern>
+		<pattern>/branch/**/*</pattern>
+		<pattern>/common/** </pattern>
+		<!-- <pattern>/main.do</pattern> -->
+	</decorator>
+	
+	<!-- decoration을 적용하지 않으려는 파일을 <excludes> 에 등록 -->
+	<excludes>
+		<pattern>/resources/*</pattern>
+		<pattern>/login</pattern>
+		<pattern>/fordelivery/login</pattern>
+	</excludes>
+
+
+</decorators>

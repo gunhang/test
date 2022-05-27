@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Payment-Mapper">
+	
+	 <update id="insertPayment" parameterType="payment">
+	 	INSERT INTO TB_PAYMENT(
+							PAYMENTNO,
+							PAYMENT_TYPE,
+							MEMBERNO,
+							PAYMENT_NAME,
+							PAYMENT_PRICE
+							) VALUES (
+							#{paymentNo},
+							#{paymentType},
+							#{memberNo},
+							#{paymentName},
+							#{paymentPrice}
+							)
+	 </update>
+
+	<update id="updatePaymentOrderNo" parameterType="payment">
+		 UPDATE TB_PAYMENT
+		   SET ORDER_NO = #{orderNo}
+		 WHERE PAYMENTNO = #{paymentNo}
+ 	</update>
+</mapper>

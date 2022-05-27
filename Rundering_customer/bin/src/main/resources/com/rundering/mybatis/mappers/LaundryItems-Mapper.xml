@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="LaundryItems-Mapper">
+
+	<resultMap id="laundryItemsResult" type="laundryItems">
+		<result column="LAUNDRY_ITEMS_CODE" property="laundryItemsCode" />
+		<result column="PRICE" property="price" />
+		<result column="ITEMS_NAME" property="itemsName" />
+		<result column="REGIST_DATE" property="registDate" />
+		<result column="MODIFY_DATE" property="modifyDate" />
+		<result column="DELETE_YN" property="deleteYn" />
+		<result column="CHARGER" property="charger" />
+		<result column="LAUNDRY_CATEGORY" property="laundryCategory" />
+	</resultMap>
+
+
+	<select id="selectlaundryItemsList" resultMap="laundryItemsResult">
+		select *
+		  from TB_LAUNDRY_ITEMS
+		 where DELETE_YN='N'
+	</select>
+	
+	<select id="selectLaundryItemsBylaundryItemsCode" parameterType="str" resultMap="laundryItemsResult">
+		SELECT * FROM TB_LAUNDRY_ITEMS WHERE LAUNDRY_ITEMS_CODE = #{laundryItemsCode}
+	</select>
+
+	
+
+</mapper>

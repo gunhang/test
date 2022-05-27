@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MemberAddress-Mapper">
+	<resultMap type="memberAddress" id="memberAddressMap">
+		<result column="ADDRESS_NO" property="addressNo" />
+		<result column="ADD1" property="add1" />
+		<result column="ADD2" property="add2" /> 
+		<result column="ZIP" property="zip" />
+		<result column="REGIST_DATE" property="registDate" />
+		<result column="MODIFY_DATE" property="modifyDate" />
+		<result column="DEFAULT_YN" property="defaultYn" />
+		<result column="MEMBERNO" property="memberNo" />
+		<result column="AREA" property="area" />
+		<result column="TOPAREA" property="toparea" />
+	</resultMap>
+
+	<sql id="add2">
+		<if test="!(add2 == null)">
+			,ADD2
+		</if>
+	</sql>
+	<sql id="add2_va">
+		<if test="!(add2 == null)">
+			,#{add2}
+		</if>
+	</sql>
+	<sql id="area">
+		<if test="add1.substring(0,2) == '대전'.toString()">
+			,AREA
+		</if>
+	</sql>
+
+	<sql id="area_va">
+		<if test="add1.substring(0,2) == '대전'.toString()">
+			,#{area}
+		</if>
+	</sql>
+
+
+	<update id="addRegist" parameterType="memberAddress">
+		INSERT INTO
+		TB_MEMBER_ADDRESS(ADDRESS_NO,ADD1,ZIP,MEMBERNO,TOPAREA
+		<include refid="add2" />
+		<include refid="area" />
+		)
+		VALUES(WEEKSMALLNO_SEQ.NEXTVAL,#{add1},#{zip},#{memberNo},#{toparea}
+		<include refid="add2_va" />
+		<include refid="area_va" />
+		)
+	</update>
+	
+
+</mapper>

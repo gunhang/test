@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MemberAddress-Mapper">
+	<resultMap type="memberAddress" id="memberAddressMap">
+		<result column="ADDRESS_NO" property="addressNo" />
+		<result column="ADD1" property="add1" />
+		<result column="ADD2" property="add2" />
+		<result column="ZIP" property="zip" />
+		<result column="REGIST_DATE" property="registDate" />
+		<result column="MODIFY_DATE" property="modifyDate" />
+		<result column="DEFAULT_YN" property="defaultYn" />
+		<result column="MEMBERNO" property="memberNo" />
+		<result column="AREA" property="area" />
+		<result column="TOPAREA" property="toparea" />
+	</resultMap>
+
+	<sql id="add2">
+		<if test="!(add2 == null)">
+			,ADD2
+		</if>
+	</sql>
+	<sql id="add2_va">
+		<if test="!(add2 == null)">
+			,#{add2}
+		</if>
+	</sql>
+	<sql id="area">
+		<if test="add1.substring(0,2) == '대전'.toString()">
+			,AREA
+		</if>
+	</sql>
+
+	<sql id="area_va">
+		<if test="add1.substring(0,2) == '대전'.toString()">
+			,#{area}
+		</if>
+	</sql>
+	
+	<sql id="noArea">
+		<if test="add1.substring(0,2) == '대전'.toString()">
+			,AREA = #{area}
+		</if>
+	</sql>
+	
+	<sql id="noAdd2">
+		<if test="!(add2 == null)">
+			,ADD2 = #{add2}
+		</if>
+	</sql>
+
+
+	<update id="addressRegist" parameterType="memberAddress">
+		INSERT INTO
+		TB_MEMBER_ADDRESS(ADDRESS_NO,ADD1,ZIP,MEMBERNO,TOPAREA
+		<include refid="add2" />
+		<include refid="area" />
+		)
+		VALUES(WEEKSMALLNO_SEQ.NEXTVAL,#{add1},#{zip},#{memberNo},#{toparea}
+		<include refid="add2_va" />
+		<include refid="area_va" />
+		)
+	</update>
+	
+	<update id="addaddressRegist" parameterType="memberAddress">
+		INSERT INTO
+		TB_MEMBER_ADDRESS(ADDRESS_NO,ADD1,ZIP,DEFAULT_YN,MEMBERNO,TOPAREA
+		<include refid="add2" />
+		<include refid="area" />
+		)
+		VALUES(WEEKSMALLNO_SEQ.NEXTVAL,#{add1},#{zip},'N',#{memberNo},#{toparea}
+		<include refid="add2_va" />
+		<include refid="area_va" />
+		)
+	</update>
+	
+	<select id="selectDefaultMemberAddressByMemberNo" resultMap="memberAddressMap" parameterType="str">
+		select * from TB_MEMBER_ADDRESS WHERE MEMBERNO = #{memberNo} AND DEFAULT_YN = 'Y'
+	</select>
+	
+	<select id="selectMemberAddressListByMemberNo" resultMap="memberAddressMap" parameterType="str">
+		select * from TB_MEMBER_ADDRESS WHERE MEMBERNO = #{memberNo}
+	</select>
+	
+	<select id="selectMemberAddressByAddressNo" resultMap="memberAddressMap" parameterType="str">
+		select * from TB_MEMBER_ADDRESS WHERE ADDRESS_NO = #{addressNo}
+	</select>
+	
+	<update id="updateAllMemberAddressDefaultN" parameterType="str">
+		 UPDATE TB_MEMBER_ADDRESS
+		   SET DEFAULT_YN = 'N'
+		 WHERE ADDRESS_NO IN (SELECT ADDRESS_NO 
+		                        FROM TB_MEMBER_ADDRESS 
+		                        WHERE MEMBERNO = #{memberNo})
+ 	</update>
+ 	
+ 		<update id="updateDefaultAddress" parameterType="memberAddress">
+		 UPDATE TB_MEMBER_ADDRESS
+		   SET ADD1 = #{add1}
+			,ADD2 = #{add2}
+			,ZIP = #{zip}
+		 WHERE ADDRESS_NO IN (SELECT ADDRESS_NO 
+		                        FROM TB_MEMBER_ADDRESS 
+		                       WHERE MEMBERNO = #{memberNo})
+		   AND DEFAULT_YN = 'Y'
+ 	</update>
+ 	
+ 	<update id="updateDefaultReset" parameterType="str">
+ 		UPDATE TB_MEMBER_ADDRESS
+			SET
+			 DEFAULT_YN = 'N'
+			,MODIFY_DATE = SYSDATE
+		  WHERE MEMBERNO = #{memberNo}
+			AND DEFAULT_YN = 'Y'
+ 	</update>
+ 	
+ 	<update id="modifyDefaultAddr" parameterType="memberAddress">
+ 		UPDATE TB_MEMBER_ADDRESS
+			SET 
+			 ZIP = #{zip}
+			,ADD1 = #{add1}
+			,DEFAULT_YN = 'Y'
+			,TOPAREA = #{toparea}
+			<include refid="noArea" />
+			<include refid="noAdd2" />
+		    WHERE ADDRESS_NO = #{addressNo}
+ 	</update>
+ 	
+ 	<update id="modifyAddr" parameterType="memberAddress">
+ 		UPDATE TB_MEMBER_ADDRESS
+			SET 
+			 ZIP = #{zip}
+			,ADD1 = #{add1}
+			,TOPAREA = #{toparea}
+			<include refid="noArea" />
+			<include refid="noAdd2" />
+			WHERE ADDRESS_NO = #{addressNo}
+ 	</update>
+ 	
+ 	<update id="removeByAddressNo" parameterType="str">
+ 		DELETE FROM TB_MEMBER_ADDRESS
+		WHERE
+		ADDRESS_NO = #{addressNo}
+ 	</update>
+ 	
+ 	
+	
+
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Employees-Mapper">
+
+<resultMap type="employees" id="employeesMap">
+	<result column="EMPLOYEE_ID" property="employeeId" />
+	<result column="BRANCH_CODE" property="branchCode" />
+	<result column="JOINING_COMPANY_DATE" property="joiningCompanyDate" />
+	<result column="DEPARTMENT" property="department" />
+	<result column="POSITION" property="position" />
+	<result column="REGIST_DATE" property="registDate" />
+	<result column="MODIFY_DATE" property="modifyDate" />
+	<result column="DELETE_YN" property="deleteYn" />
+	<result column="MEMBERNO" property="memberno" />
+</resultMap>
+
+
+	<select id="selectEmployeesByBranchCode" resultMap="employeesMap" parameterType="str">
+		select *
+		  from tb_employees
+		 where BRANCH_CODE = #{branchCode} 
+		  AND DELETE_YN = 'N'
+	</select>
+
+
+
+</mapper>

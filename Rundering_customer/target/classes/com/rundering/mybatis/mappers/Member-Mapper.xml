@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Member-Mapper">
+<resultMap type="member" id="memberMap">
+	<result column="MEMBERNO" property="memberNo"/>
+	<result column="ID" property="id"/>
+	<result column="PASSWORD" property="password"/>
+	<result column="NAME" property="name"/>
+	<result column="PHONE" property="phone"/>
+	<result column="EMAIL" property="email"/>
+	<result column="REGIST_DATE" property="registDate"/>
+	<result column="MODIFY_DATE" property="modifyDate"/>
+	<result column="ENABLE_WHETHER" property="enableWhether"/>
+	<result column="DELETE_YN" property="deleteYn"/>
+	<result column="LASTLOGPSNHOURLIVER" property="lastLogpsnHourLiver"/>
+	<result column="LOGINFAIL_COUNT" property="loginfailCount"/>
+	<result column="EMPLOYEE_ID_YN" property="employeeIdYn"/>
+</resultMap>
+
+
+	<select id="selectMemberById" resultMap="memberMap" parameterType="str">
+		select *
+		from TB_MEMBER
+		where ID=#{id}
+	</select>
+
+	<select id="selectAuthByMemberNo" resultType="str" parameterType="str">
+		select AUTH_GRP_CODE
+		from TB_USER_AUTH
+		where MEMBERNO=#{memberNo}
+	</select>
+
+	<update id="memberJoin" parameterType="member">
+		INSERT INTO 
+		TB_MEMBER(MEMBERNO,ID,PASSWORD,NAME,PHONE,EMAIL) 
+		VALUES (MEMBERNO_SEQ.NEXTVAL,#{id},#{password},#{name},#{phone},#{email})
+	</update>
+	
+	<update id="deleteMember" parameterType="str" >
+		UPDATE TB_MEMBER
+		SET 
+		ENABLE_WHETHER = 0
+		,MODIFY_DATE = SYSDATE
+		,DELETE_YN = 'Y'
+		WHERE ID=#{id}
+	</update>
+	
+	<select id="selectIdFindByMember" resultType="int" parameterType="member">
+		SELECT COUNT(*) 
+		  FROM TB_MEMBER
+		 WHERE NAME=#{name}
+		   AND EMAIL=#{email}
+	</select>
+	<select id="selectPasswordFindByMember" resultType="int" parameterType="member">
+		SELECT COUNT(*)
+		  FROM TB_MEMBER
+		 WHERE name=#{name}
+		   AND email=#{email}
+		   AND id=#{id}
+	</select>
+	<select id="selectGetFindIdByMember"  resultType="str" parameterType="member">
+		select id 
+		  from TB_MEMBER
+		 where name=#{name}
+		   and email=#{email}
+	</select>
+	
+	<update id="updateLoginfailCountByMemberNo" parameterType="str">
+		update TB_MEMBER
+		   set loginfail_count=loginfail_count+1
+		 where MEMBERNO=#{memberNo}  
+	</update>
+	<update id="updateLoginfailZeroByMemberNo" parameterType="str">
+		update TB_MEMBER
+		   set loginfail_count=0
+		 where MEMBERNO=#{memberNo}  
+	</update>
+	<update id="updateLastLoginByMemberNo" parameterType="str">
+		update tb_member
+		   set LASTLOGPSNHOURLIVER=sysdate
+		 where MEMBERNO=#{memberNo} 
+	</update>
+	<update id="modifyMember" parameterType="member" >
+		UPDATE TB_MEMBER 
+		SET 
+		EMAIL=#{email},PHONE=#{phone},MODIFY_DATE=SYSDATE
+		WHERE ID=#{id}
+	</update>
+	
+	<update id="updatePasswordByMember" parameterType="member">
+		UPDATE TB_MEMBER
+		   SET PASSWORD=#{password}
+		   ,MODIFY_DATE = SYSDATE
+		 where ID=#{id}  
+	</update>
+	
+
+	<select id="checkId" resultType="member" parameterType="str">
+		SELECT ID
+		FROM TB_MEMBER
+		WHERE ID =#{id}
+	</select>
+
+	<select id="checkPw" resultType="str" parameterType="str">
+		SELECT PASSWORD
+		FROM TB_MEMBER
+		WHERE ID =#{id}
+	</select>
+	
+	<select id="checkEmail" resultType="MemberAddCommand" parameterType="str">
+		SELECT EMAIL
+		FROM TB_MEMBER
+		WHERE email =#{email}
+	</select>
+	
+	
+
+</mapper>

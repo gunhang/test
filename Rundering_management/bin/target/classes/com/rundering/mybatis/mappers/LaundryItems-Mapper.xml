@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="LaundryItems-Mapper">
+
+	<resultMap id="laundryItemsResult" type="laundryItems">
+		<result column="LAUNDRY_ITEMS_CODE" property="laundryItemsCode" />
+		<result column="PRICE" property="price" />
+		<result column="ITEMS_NAME" property="itemsName" />
+		<result column="REGIST_DATE" property="registDate" />
+		<result column="MODIFY_DATE" property="modifyDate" />
+		<result column="DELETE_YN" property="deleteYn" />
+		<result column="CHARGER" property="charger" />
+		<result column="LAUNDRY_CATEGORY" property="laundryCategory" />
+	</resultMap>
+	
+	<sql id="searchSort">	
+		<if test="laundryItemsCode == '01'.toString()">
+		</if>
+		<if test="laundryItemsCode == 'BE'.toString()">
+			AND LAUNDRY_CATEGORY like 'BE'		
+		</if>
+		<if test="laundryItemsCode == 'CL'.toString()">
+			AND LAUNDRY_CATEGORY like 'CL'		
+		</if>
+		<if test="laundryItemsCode == 'SH'.toString()">
+			AND LAUNDRY_CATEGORY like 'SH'		
+		</if>
+	</sql>	
+	
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			AND B.LAUNDRY_ITEMS_CODE like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			AND B.ITEMS_NAME like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'tc'.toString()">
+			AND (
+			B.LAUNDRY_ITEMS_CODE like '%'||#{keyword}||'%'
+			or
+			B.ITEMS_NAME like '%'||#{keyword}||'%'						
+			)			
+		</if>
+	</sql>
+	
+	<select id="selectSearchLaundryItemList" resultMap="laundryItemsResult">
+		select
+			B.LAUNDRY_CATEGORY
+		    ,B.LAUNDRY_ITEMS_CODE
+		    ,B.ITEMS_NAME
+		    ,B.PRICE
+		FROM TB_EMPLOYEES A, TB_LAUNDRY_ITEMS B
+		WHERE A.EMPLOYEE_ID = B.CHARGER
+		AND B.LAUNDRY_ITEMS_CODE is not null
+		AND B.DELETE_YN='N'
+		<include refid="searchSort" />
+		<include refid="search" />
+		order by B.regist_date desc
+	
+	</select>
+	
+	<select id="selectLaundryItemsBylaundryItemsCode" parameterType="str" resultMap="laundryItemsResult">
+		SELECT * FROM TB_LAUNDRY_ITEMS WHERE LAUNDRY_ITEMS_CODE = #{laundryItemsCode}
+	</select>
+
+	<select id="selectClothingSequenceNextValue" resultType="str">
+		select LPAD(CLOTHING_ITEMS_CODE_SEQ.NEXTVAL, 3, 0) from DUAL
+	</select>
+	<select id="selectBeddingSequenceNextValue" resultType="str">
+		select LPAD(BEDDING_ITEMS_CODE_SEQ.NEXTVAL, 3, 0) from DUAL
+	</select>
+	<select id="selectShoesSequenceNextValue" resultType="str">
+		select LPAD(SHOES_ITEMS_CODE_SEQ.NEXTVAL, 3, 0) from DUAL
+	</select>
+	<select id="selectLaundryItemsCriteriaTotalCount" resultType="int">
+		select
+		count(*)
+		from
+		TB_LAUNDRY_ITEMS
+		where LAUNDRY_ITEMS_CODE is not null
+		<include refid="searchSort" />
+		<if test="searchType == 't'.toString()">
+			AND LAUNDRY_ITEMS_CODE like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			AND ITEMS_NAME like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'tc'.toString()">
+			AND (
+			LAUNDRY_ITEMS_CODE like '%'||#{keyword}||'%'
+			or
+			ITEMS_NAME like '%'||#{keyword}||'%'						
+			)			
+		</if>
+	</select>
+	
+
+	<update id="insertLaundryItems" parameterType="laundryItems">
+		INSERT INTO TB_LAUNDRY_ITEMS(
+						LAUNDRY_ITEMS_CODE
+						,ITEMS_NAME
+						,PRICE
+						,CHARGER
+						,LAUNDRY_CATEGORY
+						) VALUES (
+						#{laundryCategory}||#{laundryItemsCode}
+						,#{itemsName}
+						,#{price}
+						,'MA22001'
+						,#{laundryCategory}
+						)
+	</update>
+	
+	<update id="updateLaundryItems" parameterType="laundryItems">
+		update TB_LAUNDRY_ITEMS
+		set 
+		ITEMS_NAME=#{itemsName},price=#{price}
+		where LAUNDRY_ITEMS_CODE=#{laundryItemsCode}
+		
+	</update>
+	
+	
+	<update id="deleteLaundryItems" parameterType="str">
+		delete 
+		from TB_LAUNDRY_ITEMS 
+		where LAUNDRY_ITEMS_CODE=#{laundryItemsCode}		
+	</update>	
+	
+
+</mapper>

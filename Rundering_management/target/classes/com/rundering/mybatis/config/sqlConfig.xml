@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	
+					
+	<typeAliases>
+		<typeAlias type="java.lang.String" alias="str" />
+		<typeAlias type="java.lang.Integer" alias="int" />
+		
+		<typeAlias type="com.rundering.dto.AsRequestVO" alias="asRequest" />
+		<typeAlias type="com.rundering.dto.BranchVO" alias="branch"/>
+		<typeAlias type="com.rundering.dto.MemberVO" alias="member" />
+		<typeAlias type="com.rundering.dto.MemberAddressVO" alias="memberAddress" />
+		<typeAlias type="com.rundering.dto.AttachVO" alias="attach" />
+		<typeAlias type="com.rundering.dto.MenuVO" alias="menu" />
+		<typeAlias type="com.rundering.dto.LaundryItemsVO" alias="laundryItems" />
+		<typeAlias type="com.rundering.dto.EmployeesVO" alias="employees" />
+		<typeAlias type="com.rundering.dto.SuggestVO" alias="suggest" />
+		<typeAlias type="com.rundering.dto.FAQVO" alias="faq" />
+		<typeAlias type="com.rundering.dto.LaundryArticlesVO" alias="laundryArticles" />
+		<typeAlias type="com.rundering.dto.LaundryFixturesVO" alias="laundryFixtures" />
+		<typeAlias type="com.rundering.dto.NoticeVO" alias="notice" />
+		<typeAlias type="com.rundering.dto.ItemVO" alias="item" />
+		<typeAlias type="com.rundering.dto.ItemOrderVO" alias="itemOrder" />
+		<typeAlias type="com.rundering.dto.ItemInsertVO" alias="itemInsert" />
+		<typeAlias type="com.rundering.dto.ItemOutVO" alias="itemOut" />
+		<typeAlias type="com.rundering.dto.ItemOrderDetailVO" alias="itemOrderDetail" />
+		<typeAlias type="com.rundering.dto.ComCodeVO" alias="comCode" />
+		<typeAlias type="com.rundering.dto.LaundryOrderVO" alias="laundryOrder" />
+		<typeAlias type="com.rundering.dto.LaundryOrderDetailVO" alias="laundryOrderDetail"/>
+		<typeAlias type="com.rundering.dto.LaundryItemsVO" alias="laundryItems" />
+		<typeAlias type="com.rundering.dto.LaundryOrderDetailVO" alias="laundryOrderDetail"/>
+		<typeAlias type="com.rundering.dto.LaundryThroughPutVO" alias="laundryThroughput" />
+		<typeAlias type="com.rundering.dto.ReplyVO" alias="reply"/>
+		<typeAlias type="com.rundering.dto.BranchVO" alias="branch"/>
+		<typeAlias type="com.rundering.dto.BranchApplicationVO" alias="branchapplication"/>
+		<typeAlias type="com.rundering.dto.LaundryGoodsStockVO" alias="laundrygoodsstock"/>
+		<typeAlias type="com.rundering.dto.NotificationVO" alias="notification"/>
+
+	</typeAliases>
+	
+	
+</configuration>
+
+
+
+
+
+
+
+

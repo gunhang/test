@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Delivery-Mapper">
+
+	<resultMap type="laundryOrder" id="laundryOrderMap">
+		<result column="ORDER_NO" property="orderNo" />
+		<result column="REQUEST_DETAILS" property="requestDetails" />
+		<result column="ORDER_DATE" property="orderDate" />
+		<result column="CONTACT_NUMBER" property="contactNumber" />
+		<result column="DELIVERY_REQUEST_DATE"
+			property="deliveryRequestDate" />
+		<result column="TOTAL_PRICE" property="totalPrice" />
+		<result column="PICKUP_REQUEST_DATE"
+			property="pickupRequestDate" />
+		<result column="PICKUP_DATE" property="pickupDate" />
+		<result column="BRANCH_ARRIVAL_DATE"
+			property="branchArrivalDate" />
+		<result column="AREA" property="area" />
+		<result column="DELIVERY_DATE" property="deliveryDate" />
+		<result column="ORDER_STATUS" property="orderStatus" />
+		<result column="CANCEL_YN" property="cancelYn" />
+		<result column="PAYMENTNO" property="paymentNo" />
+		<result column="BRANCH_CODE" property="branchCode" />
+		<result column="MEMBERNO" property="memberNo" />
+		<result column="DELIVERY_EMPLOYEE_ID"
+			property="deliveryEmployeeId" />
+		<result column="PICKUP_EMPLOYEE_ID" property="pickupEmployeeId" />
+		<result column="ZIP" property="zip" />
+		<result column="ADD1" property="add1" />
+		<result column="ADD2" property="add2" />
+		<result column="ATCH_FILE_NO" property="atchFileNo" />
+		<result column="REPLYNO" property="replyNo" />
+	</resultMap>
+
+	<resultMap type="laundryOrderDetail"
+		id="laundryOrderDetailMap">
+		<result column="DETAIL_ORDERNO" property="detailOrderno" />
+		<result column="ORDER_NO" property="orderNo" />
+		<result column="PRICE" property="price" />
+		<result column="LAUNDRY_ITEMS_CODE" property="laundryItemsCode" />
+		<result column="QUANTITY" property="quantity" />
+		<result column="ITEMS_NAME" property="itemsName" />
+	</resultMap>
+
+	<select id="selectPickupWait" resultMap="laundryOrderMap" parameterType="laundryOrder">
+		select *
+		from tb_laundry_order
+		where branch_code = #{branchCode}
+		and order_status='02'
+<!-- 		and PICKUP_REQUEST_DATE = SYSDATE
+		and PICKUP_EMPLOYEE_ID = #{pickupEmployeeId} -->
+	</select>
+	
+	<select id="selectPickupWaitCompleteList" resultMap="laundryOrderMap" parameterType="laundryOrder">
+		select *
+		from tb_laundry_order
+		where branch_code = #{branchCode}
+		and order_status='03'
+<!-- 		and PICKUP_REQUEST_DATE = SYSDATE
+		and PICKUP_EMPLOYEE_ID = #{pickupEmployeeId} -->
+	</select>
+	
+	<select id="selectOrderByOrderNo" resultMap="laundryOrderMap" parameterType="laundryOrder">
+		select *
+		from tb_laundry_order
+		where ORDER_NO=#{orderNo}
+	</select>
+
+	<select id="selectOrdertDetailList" resultMap="laundryOrderDetailMap" parameterType="str">
+		select *
+		from TB_LAUNDRY_ORDER_DETAIL
+		where ORDER_NO=#{orderNo}
+	</select>
+	
+	<select id="getAttachFileNo" parameterType="str" resultType="str">
+		SELECT ATCH_FILE_NO
+		FROM TB_LAUNDRY_ORDER
+		WHERE ORDER_NO = #{orderNo}
+	</select>
+	
+	
+	<update id="updatePickUpCom" parameterType="laundryOrder">
+		UPDATE TB_LAUNDRY_ORDER
+		<if test="orderStatus == '02'.toString() ">
+			SET PICKUP_DATE = null
+		</if>
+		<if test="orderStatus == '03'.toString() ">
+			SET PICKUP_DATE = sysdate
+		</if>
+		<if test="orderStatus == '08'.toString() or orderStatus == '09'.toString()">
+			SET DELIVERY_DATE = SYSDATE
+		</if>
+		<if test="orderStatus == '07'.toString() ">
+			SET DELIVERY_DATE = null
+		</if>
+		,ORDER_STATUS = #{orderStatus}
+		WHERE ORDER_NO = #{orderNo}
+		<if test="orderStatus == '02'.toString() or orderStatus == '03'.toString()">
+<!-- 		AND PICKUP_EMPLOYEE_ID #{deliveryEmployeeId} -->
+		</if>
+		<if test="orderStatus == '08'.toString() or orderStatus == '09'.toString() or orderStatus == '07'.toString()">
+<!--        AND DELIVERY_EMPLOYEE_ID = #{deliveryEmployeeId} -->
+		</if>
+	</update>
+	
+	<update id="updateToBranch" parameterType="str">
+		UPDATE TB_LAUNDRY_ORDER
+		SET 
+		BRANCH_ARRIVAL_DATE = SYSDATE
+		,ORDER_STATUS = '04'
+		where branch_code = #{branchCode}
+		AND ORDER_STATUS = '03'
+<!-- 		AND DELIVERY_EMPLOYEE_ID = #{deliveryEmployeeId} -->
+		
+	</update>
+
+
+	<select id="selectDeliveryList" resultMap="laundryOrderMap" parameterType="laundryOrder">
+		select *
+		from tb_laundry_order
+		where branch_code = #{branchCode}
+          and order_status='07'
+<!-- 		and DELIVERY_REQUEST_DATE = SYSDATE
+		and DELIVERY_EMPLOYEE_ID = #{deliveryEmployeeId} -->
+	</select>
+
+	<select id="selectDeliveryComList" resultMap="laundryOrderMap" parameterType="laundryOrder">
+		select *
+		from tb_laundry_order
+		where branch_code = #{branchCode}
+		and order_status='08'
+		 or order_status='09'
+<!-- 		and DELIVERY_REQUEST_DATE = SYSDATE
+		and DELIVERY_EMPLOYEE_ID = #{deliveryEmployeeId} -->
+	</select>
+	
+	
+	<!-- 주소 오름차순  -->
+	<select id="sortAddressAsc" resultMap="laundryOrderMap"  parameterType="laundryOrder">
+		SELECT *
+			FROM TB_LAUNDRY_ORDER
+			WHERE BRANCH_CODE = #{branchCode}
+			AND ORDER_STATUS = #{orderStatus}
+			ORDER BY ADD1 ASC
+	</select>
+	<!-- 주소 내림차순  -->
+	<select id="sortAddressDesc" resultMap="laundryOrderMap"  parameterType="laundryOrder">
+		SELECT *
+			FROM TB_LAUNDRY_ORDER
+			WHERE BRANCH_CODE = #{branchCode}
+			AND ORDER_STATUS = #{orderStatus}
+			ORDER BY ADD1 DESC
+	</select>
+	
+	<select id="selectPickupCount" resultType="int" parameterType="str">
+		select count(*)
+		  from TB_LAUNDRY_ORDER
+		 WHERE BRANCH_CODE=#{branchCode}
+		   AND ORDER_STATUS='02'
+	</select>
+	
+	<select id="selectDeliveryCount" resultType="int" parameterType="str">
+		select count(*)
+		  from TB_LAUNDRY_ORDER
+		 WHERE BRANCH_CODE=#{branchCode}
+		   AND ORDER_STATUS='07'
+	</select>
+</mapper>

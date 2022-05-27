@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="FAQ-mapper">
+
+	<resultMap type="faq" id="faqMap">
+
+		<result column="FAQNO" property="faqno" />
+		<result column="SETBUKDOORCLCODE" property="setbukdoorclcode" />
+		<result column="QUESTION" property="question" />
+		<result column="ANSWER" property="answer" />
+		<result column="REGIST_DATE" property="registDate" />
+		<result column="MODIFY_DATE" property="modifyDate" />
+		<result column="WRITER" property="writer" />
+		<result column="SECRETYN" property="secretyn" />
+		<result column="ANSWER_WRITER" property="answerwriter" />
+		<result column="FAQYN" property="faqyn" />
+		<result column="FCONTENT" property="fcontent" />
+		<result column="ORDERNO" property="orderno" />
+		<result column="ATCH_FILE_NO" property="atchfileno" />
+
+	</resultMap>
+
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and a.question like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and a.fcontent like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'tc'.toString()">
+			and (
+			a.question like '%'||#{keyword}||'%'
+			or
+			a.fcontent like '%'||#{keyword}||'%'
+			)
+		</if>
+	</sql>
+
+	<!-- 리스트보기 -->
+	<select id="selectSearchFAQList" resultMap="faqMap">
+		select
+			a.faqno,
+			a.setbukdoorclcode,
+			a.question,
+			a.fcontent,
+			b.name as writer,
+			a.regist_date,
+			a.secretyn,
+			a.faqyn,
+			a.answer
+		from tb_faq a, tb_member b
+			where a.writer = b.memberno
+			and a.faqyn = 'N'
+			<include refid="search" />
+		order by a.faqno desc
+	</select>
+
+	<select id="selectSearchFAQListCount" resultType="int">
+		select
+		count(*)
+		from tb_faq a
+		where a.faqno is not null
+		  and a.faqyn = 'N'
+		<include refid="search" />
+		order by a.regist_date desc
+	</select>
+
+	<select id="selectFAQByFaqno" parameterType="int" resultMap="faqMap">
+		select a.faqno, a.setbukdoorclcode, a.question, a.fcontent, a.orderno, a.regist_date, b.name as writer, a.answer
+		from tb_faq a, tb_member b
+		where faqno=#{faqno}
+			and a.writer = b.memberno
+	</select>
+	<select id="selectOriginalFAQByFaqno" parameterType="int" resultMap="faqMap">
+		select *
+		from tb_faq
+		where faqno=#{faqno}
+	</select>
+
+	<select id="selectFAQSequenceNextValue" resultType="int">
+		select
+			faqno_seq.nextVal
+		from dual
+	</select>
+	
+	<update id="replyFAQ" parameterType="faq">
+		update tb_faq
+		set
+			answer=#{answer}
+		where faqno=#{faqno}
+	</update>
+	
+	<!-- 자주묻는질문 검색 -->	
+	<sql id="frequently">
+		<if test="searchType == 't'.toString()">
+			and question like '%'||#{keyword}||'%'
+		</if>
+	</sql>
+	
+	<!-- 자주묻는질문 리스트보기 -->
+	<select id="selectFrequentlyList" resultMap="faqMap">
+		select
+			faqno,
+		    question,
+		    answer,
+		    faqyn
+		 from tb_faq
+			where faqyn = 'Y'
+			<include refid="frequently" />
+			order by faqno asc		 
+	</select>
+	
+	<!-- 자주묻는질문 입력 -->
+	<select id="insertFrequently" resultType="faq">
+		insert into tb_faq(
+			faqno,
+			question,
+			answer,
+			faqyn
+			) values (
+				faqno_seq.nextval,
+				#{question},
+				#{answer},
+				'Y')
+	</select>
+	
+	<select id="selectFrequentlyListCount" resultType="int">
+		select
+		count(*)
+		from tb_faq
+		where faqno is not null
+		  and faqyn = 'Y'
+		<include refid="frequently" />
+		order by regist_date desc
+	</select>
+	
+	<update id="updateFrequently" parameterType="faq">
+		update tb_faq
+		set
+			question=#{question}, fcontent=#{fcontent}
+		where faqno=#{faqno}
+	</update>
+	
+	<update id="deleteFrequently" parameterType="int">
+		delete
+		from tb_faq
+		where faqno=#{faqno}
+	</update>
+
+</mapper>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LaundryArticles-Mapper">
+	<resultMap type="laundryArticles" id="laundryArticlesMap">
+		<result column="ARTICLES_CODE" property="articlesCode"/>
+		<result column="ARTICLES_NAME" property="articlesName"/>
+		<result column="PRICE" property="price"/>
+		<result column="CLCODE" property="clcode"/>
+		<result column="REGIST_DATE" property="registDate"/>
+		<result column="MODIFY_DATE" property="modifyDate"/>
+		<result column="DELETE_KEY" property="deleteKey"/>
+		<result column="EACH" property="each"/>
+		<result column="NOTE" property="note"/>
+		<result column="ATCH_FILE_NO" property="atchFileNo"/>
+	</resultMap>
+<sql id="search">
+	<if test="clcode == 'B'.toString()">
+		AND CLCODE LIKE 'B'
+	</if>
+	<if test="clcode == 'C'.toString()">
+		AND CLCODE LIKE 'C'
+	</if>
+	<if test="clcode == 'D'.toString()">
+		AND CLCODE LIKE 'D'
+	</if>
+	<if test="clcode == 'E'.toString()">
+		AND CLCODE LIKE 'E'
+	</if>
+	<if test="clcode == 'F'.toString()">
+		AND CLCODE LIKE 'F'
+	</if>
+</sql>
+
+	<select id="NotALaundryArticlesList" resultMap="laundryArticlesMap" parameterType="str">
+		select *
+		  from TB_LAUNDRY_ARTICLES
+		 where DELETE_YN='N'
+		   and CLCODE !='A'
+		 <include refid="search"/>
+		 order by ARTICLES_CODE ASC
+	</select>
+	
+	<select id="selectSearchLaundryArticlesListCount" resultType="int">
+		select
+		count(*)
+		from
+		TB_LAUNDRY_ARTICLES
+		where ARTICLES_CODE is not null  	
+		<include refid="search"/>  
+		  and DELETE_YN='N'
+		  and CLCODE !='A'
+		order by ARTICLES_CODE ASC
+	</select>
+	
+	<select id="selectLaundryArticlesByArticlesCode"  resultMap="laundryArticlesMap">
+		select * 
+		  from TB_LAUNDRY_ARTICLES
+		 where ARTICLES_CODE=#{articlesCode}
+		   and  DELETE_YN='N'
+	</select>
+	
+	<select id="selectLandryArticlesStock" resultMap="laundryArticlesMap">
+		select * 
+		  from TB_LAUNDRY_ARTICLES
+		 where CLCODE !='A'
+	</select>
+	<select id="selectLaundryArticles" resultType="str"  parameterType="str">
+	select SUBSTR(ARTICLES_CODE,2)
+	  from (
+		select ARTICLES_CODE
+		  from TB_LAUNDRY_ARTICLES
+		 where CLCODE =#{clcode}
+		order by ARTICLES_CODE  desc 
+		)
+	where <![CDATA[
+					ROWNUM  <= 1
+			 	]]>
+	</select>
+	
+	
+	<update id="insertLaundryArticles" parameterType="laundryArticles">
+		insert 
+		into 
+		TB_LAUNDRY_ARTICLES(ARTICLES_CODE,ARTICLES_NAME,PRICE,EACH,NOTE,CLCODE,ATCH_FILE_NO)
+		values
+		(#{articlesCode},#{articlesName},#{price},#{each},#{note},#{clcode},#{atchFileNo})
+	</update>
+	
+	<update id="updateLaundryArticles" parameterType="laundryArticles">
+		update 
+		TB_LAUNDRY_ARTICLES 
+		set 
+		ARTICLES_CODE=#{articlesCode}, ARTICLES_NAME=#{articlesName}, PRICE=#{price}, MODIFY_DATE=sysdate,EACH=#{each},NOTE=#{note}, ATCH_FILE_NO=#{atchFileNo}
+		where ARTICLES_CODE=#{articlesCode}
+	</update>
+	
+	<update id="deleteLaundryArticles" parameterType="str">
+		update
+		TB_LAUNDRY_ARTICLES
+		set
+		DELETE_YN='Y'
+		where ARTICLES_CODE=#{articlesCode}
+	</update>
+</mapper>

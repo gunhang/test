@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="ItemOrder-Mapper">
+
+	<resultMap type="itemOrder" id="itemOrderMap">
+		<result column="ORDERCODE" property="ordercode" />
+		<result column="ITEM_ORDER_PAYMENT_PRICE" property="itemOrderPaymentPrice" />
+		<result column="ITEM_ORDER_STATUS" property="itemOrderStatus" />
+		<result column="CHARGER" property="charger" />
+		<result column="BRANCH_CODE" property="branchCode" />
+		<result column="REGIST_DATE" property="registDate" />
+		<result column="RECEIPT_DATE" property="receiptDate" />
+	</resultMap>
+	<resultMap type="itemOrderDetail" id="itemOrderDetailMap">
+		<result column="DETAIL_ORDERCODE" property="detailOrdercode" />
+		<result column="ORDER_COUNT" 	  property="orderCount" />
+		<result column="ARTICLES_CODE"	  property="articlesCode" />
+		<result column="ORDERCODE" 	      property="ordercode" />
+		<result column="PRICE" 	      property="price" />
+	</resultMap>
+	
+	
+	
+	<sql id="search">
+		<if test="searchType == '01'.toString()">
+			and item_order_status = '01'		
+		</if>
+		<if test="searchType == '02'.toString()">
+			and item_order_status = '02'			
+		</if>
+		<if test="searchType == '03'.toString()">
+			and item_order_status = '03'		
+		</if>
+		<if test="searchType == '04'.toString()">
+			and item_order_status = '04'	
+		</if>
+		<if test="searchType == '05'.toString()">
+			and item_order_status = '05'		
+		</if>
+		<if test="searchType == '06'.toString()">
+			and item_order_status = '06'	
+		</if>
+	</sql>
+	<select id="selectItemOrderByOrdercode" parameterType="str" resultMap="itemOrderMap">
+		select *
+		  from tb_item_order
+		 where ordercode= #{ordercode} 
+	</select>
+	
+	<select id="selectItemOrderList" resultMap="itemOrderMap">
+		select *
+		  from tb_item_order
+		 where ordercode is not null
+		 <include refid="search"/>
+		 order by regist_date
+	</select>
+	<select id="selectItemOrderDetailByOrdercode" resultMap="itemOrderDetailMap">
+		select *
+		  from tb_item_order_detail
+		 where ordercode = #{ordercode} 
+	</select>
+	
+	<select id="selectItemOrderBranchCodeByOrdercode" resultType="str" parameterType="str">
+		select branch_code
+		  from tb_item_order
+		 where ordercode=#{ordercode} 
+	</select>
+	
+	<select id="selectCount" resultType="int">
+		select count(*)
+		from tb_item_order
+		where ordercode is not null
+		<include refid="search"/>
+		 <if test="!branchCode.equals('') and branchCode!=null">
+			and branch_code = #{branchCode}
+		</if>
+	</select>
+	
+	<select id="selectTotalPriceByOrderCode" resultType="str" parameterType="str">
+		select SUM(price)
+		  from tb_item_order_detail
+		 where ordercode =#{ordercode} 
+	</select>
+	
+	
+	<select id="seq" resultType="str">
+		select item_order_seq.nextval
+		  from dual
+	</select>
+	
+	
+	<insert id="insertItemOrderByItmeOrder" parameterType="itemOrder">
+		insert into tb_item_order
+		(
+		ORDERCODE,
+		ITEM_ORDER_PAYMENT_PRICE, 
+		BRANCH_CODE
+		) 
+		VALUES 
+		(
+		#{ordercode},
+		#{itemOrderPaymentPrice},
+		#{branchCode}
+		)
+	</insert>
+	
+	<insert id="insertItemOrderDetailByDetail" parameterType="itemOrderDetail">
+		insert into tb_item_order_detail
+		(
+		ORDERCODE,
+		ARTICLES_CODE, 
+		SEQ,
+		ORDER_COUNT,
+		PRICE
+		) 
+		VALUES 
+		(
+		${ordercode},
+		#{articlesCode},
+		#{seq},
+		#{orderCount},
+		#{price}
+		)
+	</insert>
+	
+	<update id="updateItemOrderStatusByOrderCode" parameterType="itemOrder">
+		update tb_item_order
+			SET item_order_status = #{itemOrderStatus}
+		WHERE ordercode=#{ordercode}
+	</update>
+	<delete id="deleteItemOrderDetailRemove" parameterType="str">
+		DELETE from tb_item_order_detail where ordercode = #{ordercode}
+	</delete>
+	
+	<delete id="deleteItemOrderRemoveByOrdercode" parameterType="str">
+		DELETE from tb_item_order where ordercode = #{ordercode}
+	</delete>
+	
+	<delete id="itemOrderRemove" parameterType="str">
+		DELETE from tb_item_order where ordercode = #{seq}
+	</delete>
+	
+	<delete id="itemOrderDetailRemove" parameterType="str">
+		DELETE from tb_item_order_detail where ordercode = #{seq}
+	</delete>
+		
+
+</mapper>

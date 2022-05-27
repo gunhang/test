@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="Employees-Mapper">
+
+<resultMap type="employees" id="employeesMap">
+	<result column="EMPLOYEE_ID" property="employeeId" />
+	<result column="BRANCH_CODE" property="branchCode" />
+	<result column="JOINING_COMPANY_DATE" property="joiningCompanyDate" />
+	<result column="DEPARTMENT" property="department" />
+	<result column="POSITION" property="position" />
+	<result column="REGIST_DATE" property="registDate" />
+	<result column="MODIFY_DATE" property="modifyDate" />
+	<result column="DELETE_YN" property="deleteYn" />
+	<result column="MEMBERNO" property="memberno" />
+</resultMap>
+	
+	<select id="selectEmployeeById" resultMap="employeesMap" parameterType="str">
+		select *
+		  from tb_employees
+		 where memberno=#{memberno} 
+	</select>
+	<select id="selectEmployeeByMemberNo" resultMap="employeesMap" parameterType="str">
+		select *
+		  from tb_employees
+		 where memberno=#{memberno} 
+	</select>
+	
+	
+	<select id="selectEmployeeByMno" resultMap="employeesMap" parameterType="str">
+		select 
+			A.EMPLOYEE_ID as EMPLOYEE_ID
+			,A.BRANCH_CODE as BRANCH_CODE
+			,A.JOINING_COMPANY_DATE as JOINING_COMPANY_DATE
+			,A.DEPARTMENT as DEPARTMENT
+			,A.POSITION as POSITION
+			,A.REGIST_DATE as REGIST_DATE
+			,A.MODIFY_DATE as MODIFY_DATE
+			,A.DELETE_YN as DELETE_YN
+			,A.MEMBERNO as MEMBERNO
+		  from TB_EMPLOYEES A, TB_MEMBER B
+		 where A.MEMBERNO = B.MEMBERNO
+		   and A.MEMBERNO=#{memberno}
+	</select>
+	<update id="employeeRegist" parameterType="employees" >
+		INSERT INTO
+		TB_EMPLOYEES(
+		EMPLOYEE_ID
+		,BRANCH_CODE
+		,DEPARTMENT
+		,POSITION
+		,MEMBERNO
+		) VALUES(
+		#{department} ||'22'||LPAD(EMPLOYEE_ID_SEQ.NEXTVAL, 3, 0)
+		,#{branchCode}
+		,#{department}
+		,#{position}
+		,#{memberno}
+		)
+	</update>
+	
+	<select id="getEmployeeByNo" resultMap="employeesMap" parameterType="str" >
+		SELECT *
+		FROM TB_EMPLOYEES
+		WHERE MEMBERNO = #{memberno}
+	</select>
+	
+	<select id="selectDeliveryDepartmentEmployeesByBranchCode" resultMap="employeesMap" parameterType="str">
+		select *
+		  from tb_employees
+		 where BRANCH_CODE = #{branchCode} 
+		  and DEPARTMENT = 'DE'
+		  AND DELETE_YN = 'N'
+	</select>
+	
+	<select id="selectEmployeesByBranchCode" resultMap="employeesMap" parameterType="str">
+		select *
+		  from tb_employees
+		 where BRANCH_CODE = #{branchCode} 
+		  AND DELETE_YN = 'N'
+	</select>
+	<insert id="employeeBranchRegist" parameterType="employees" >
+		INSERT INTO
+		TB_EMPLOYEES(
+		EMPLOYEE_ID
+		,BRANCH_CODE
+		,DEPARTMENT
+		,POSITION
+		,MEMBERNO
+		) VALUES(
+		'03' ||'22'||LPAD(EMPLOYEE_ID_SEQ.NEXTVAL, 3, 0)
+		,#{branchCode}
+		,'OF'
+		,'03'
+		,#{memberno}
+		)
+	</insert>
+	
+
+	<sql id="searchSort">	
+		<if test="employeeSort == '0'.toString()">
+		</if>
+		<if test="employeeSort == '000000'.toString()">
+			AND A.BRANCH_CODE like '000000'		
+		</if>
+		<if test="employeeSort == '060402'.toString()">
+			AND A.BRANCH_CODE like '060402'		
+		</if>
+		<if test="employeeSort == '060101'.toString()">
+			AND A.BRANCH_CODE like '060101'		
+		</if>
+		<if test="employeeSort == '060201'.toString()">
+			AND A.BRANCH_CODE like '060201'		
+		</if>
+		<if test="employeeSort == '060301'.toString()">
+			AND A.BRANCH_CODE like '060301'		
+		</if>
+		<if test="employeeSort == '060401'.toString()">
+			AND A.BRANCH_CODE like '060401'		
+		</if>
+		<if test="employeeSort == '060501'.toString()">
+			AND A.BRANCH_CODE like '060501'		
+		</if>
+	</sql>	
+	
+	<sql id="search">	
+		<if test="searchType == 't'.toString()">
+			AND B.name like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			AND B.phone like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'tc'.toString()">
+			AND (
+			B.name like '%'||#{keyword}||'%'
+			or
+			B.phone like '%'||#{keyword}||'%'						
+			)			
+		</if>
+	</sql>	
+	
+	
+	<select id="selectSearchEmployeeList" resultType="com.rundering.command.EmployeesCommand" parameterType="str">
+		select A.EMPLOYEE_ID as employeeId,
+		    A.BRANCH_CODE as branchCode,
+		    A.DEPARTMENT as department,
+		    A.POSITION as position,
+		    A.JOINING_COMPANY_DATE as joiningCompanyDate,
+		    B.NAME,
+		    B.PHONE
+		  from tb_employees A, tb_member B
+		 WHERE A.MEMBERNO IS NOT NULL
+		 <include refid="searchSort" />
+		 <include refid="search"/>
+		   AND A.MEMBERNO = B.MEMBERNO
+		   AND B.EMPLOYEE_ID_YN = 'Y'
+	</select>
+	
+	<select id="selectSearchEmployeeListCount" resultType="int">
+		SELECT COUNT(*)
+		FROM TB_EMPLOYEES A, TB_MEMBER B
+		WHERE A.MEMBERNO IS NOT NULL
+		  and A.MEMBERNO=B.MEMBERNO
+		<include refid="searchSort" />
+		<include refid="search"/>
+	</select>
+	
+
+
+</mapper>

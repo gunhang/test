@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Suggest-mapper">
+
+	<!-- 언더바컬럼재정의 -->
+	<resultMap type="suggest" id="suggestMap">
+	
+		<result column="SNO" property="sno" />
+		<result column="TITLE" property="title" />
+		<result column="CONTENT" property="content" />
+		<result column="REGIST_DATE" property="registDate" />
+		<result column="MODIFY_DATE" property="modifyDate" />
+		<result column="DELETE_YN" property="deleteYn" />
+		<result column="VIEWCNT" property="viewcnt" />
+		<result column="WRITER" property="writer" />
+		<result column="BRANCH_NAME" property="branchName" />
+		<result column="CHECKYN" property="checkyn" />
+		
+	
+	</resultMap>
+	
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			and b.title like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'c'.toString()">
+			and b.content like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'w'.toString()">
+			and c.name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'b'.toString()">
+			and d.branch_name like '%'||#{keyword}||'%'
+		</if>
+		<if test="searchType == 'tcwb'.toString()">
+			and (
+			b.title like '%'||#{keyword}||'%'
+			or
+			b.content like '%'||#{keyword}||'%'
+			or
+			c.name like '%'||#{keyword}||'%'
+			or
+			d.branch_name like '%'||#{keyword}||'%'			
+			)			
+		</if>
+	</sql>
+	
+	<!-- 리스트보기 -->
+	<select id="selectSearchSuggestList" resultMap="suggestMap" >
+		select
+		    b.sno,
+		    b.title,
+		    b.content,
+		    c.name as writer,
+		    d.branch_name,
+		    b.regist_date,
+		    b.viewcnt,
+		    b.checkyn
+		from tb_employees a, TB_SUGGEST_BOARD b, tb_member c, tb_branch d
+		where a.employee_id = b.writer
+		  and a.memberno = c.memberno
+		  and b.branch_name = d.branch_code
+		  and b.deleteyn='N'
+		  <include refid="search" />
+		order by b.sno desc
+	</select>
+	
+	<select id="selectSearchSuggestListCount" resultType="int">
+		select
+		count(*) 
+		from tb_employees a, TB_SUGGEST_BOARD b, tb_member c, tb_branch d
+		where a.employee_id = b.writer
+		  and a.memberno = c.memberno
+		  and b.branch_name = d.branch_code
+		  and b.sno is not null
+		  and b.deleteyn='N'
+		<include refid="search" />
+		order by b.regist_date desc
+	</select>
+	
+	<select id="selectSuggestBySno" parameterType="int" resultMap="suggestMap" >
+		select b.sno, b.title, b.content, b.regist_date, c.name as writer, d.branch_name
+	    from tb_employees a, TB_SUGGEST_BOARD b, tb_member c, tb_branch d
+	    where sno=#{sno}
+	    	and a.employee_id = b.writer
+	    	and a.memberno=c.memberno
+	    	and b.writer=a.employee_id
+	    	and b.branch_name=d.branch_code
+	</select>
+	
+	<!-- 조회수 -->
+	<update id="increaseViewCount" parameterType="int">
+		update TB_SUGGEST_BOARD
+			set viewcnt=viewcnt+1
+			where sno=#{sno}
+	</update>
+	
+	<update id="checkSuggest" parameterType="suggest">
+		update TB_SUGGEST_BOARD
+			set
+			checkyn = '확인'
+			where sno=#{sno}
+			and checkyn = '미확인'
+	</update>
+	
+	<select id="selectSuggestSequenceNextValue" resultType="int">
+		select sno_seq.nextVal
+			from dual
+	</select>
+	
+	<!-- 삽입 -->
+	<select id="insertSuggest" resultType="suggest">
+		insert into TB_SUGGEST_BOARD(
+			sno,
+			title,
+			writer,
+			branch_name,
+			content) values(
+						sno_seq.nextval,
+						#{title},
+						#{writer},
+						#{branchName},
+						#{content})
+	</select>
+	
+	<!-- 수정 -->
+	<update id="updateSuggest" parameterType="suggest">
+		update TB_SUGGEST_BOARD
+		set 
+		title=#{title},content=#{content}
+		where sno=#{sno}
+	</update>
+	
+	<!-- 삭제 -->
+	<update id="deleteSuggest" parameterType="int" >
+		delete 
+		from TB_SUGGEST_BOARD
+		where sno=#{sno}		
+	</update>	
+
+</mapper>

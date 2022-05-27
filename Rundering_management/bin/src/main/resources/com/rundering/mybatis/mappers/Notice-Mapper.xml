@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Notice-Mapper">
+
+<resultMap type="notice" id="noticeMap">
+	<result column="NOTICENO" property="noticeno"/>
+	<result column="TITLE" property="title"/>
+	<result column="CONTENT" property="content"/>
+	<result column="EMPLOYEE_ID" property="employeeId"/>
+	<result column="VIEWS" property="views"/>
+	<result column="REGIST_DATE" property="registDate"/>
+	<result column="MODIFY_DATE" property="modifyDate"/>
+	<result column="DELETE_YN" property="deleteYn"/>
+	<result column="BRANCH_CODE" property="branchCode"/>
+	<result column="REPLYNO" property="replyNo"/>
+</resultMap>
+	<sql id="search">
+		<if test="searchType == 't'.toString()">
+			AND B.title like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'c'.toString()">
+			AND B.content like '%'||#{keyword}||'%'			
+		</if>
+		<if test="searchType == 'tc'.toString()">
+			AND (
+			B.title like '%'||#{keyword}||'%'
+			or
+			B.content like '%'||#{keyword}||'%'						
+			)			
+		</if>
+	</sql>
+	
+	<select id="selectSearchNoticeList" resultMap="noticeMap" >	
+		select
+			B.NOTICENO
+		    ,B.TITLE
+		    ,B.CONTENT
+		    ,C.NAME as EMPLOYEE_ID
+		    ,B.REGIST_DATE
+		    ,B.VIEWS
+		FROM TB_EMPLOYEES A, TB_NOTICE B,TB_MEMBER C
+		WHERE A.EMPLOYEE_ID = B.EMPLOYEE_ID
+		AND A.MEMBERNO = C.MEMBERNO
+		AND B.NOTICENO is not null  			  	
+		<include refid="search" />
+		order by B.regist_date desc	
+	</select>
+	
+	<select id="selectNoticeSequenceNextValue" resultType="int">
+		select NOTICENO_SEQ.nextVal
+		from dual
+	</select>
+	
+	<select id="selectReplySequenceNextValue" resultType="int">
+		select REPLYNO_SEQ.nextVal
+		from dual
+	</select>
+	 
+	
+	<select id="selectSearchNoticeListCount" resultType="int">
+		select
+		count(*) 
+		from TB_NOTICE B
+		where B.NOTICENO is not null
+		<include refid="search" />
+		order by B.REGIST_DATE desc
+	</select>
+	
+	<update id="increaseViewCount" parameterType="int">
+		update TB_NOTICE
+		set views=views+1
+		where noticeno=#{noticeno}
+	</update>
+	
+	<update id="insertNotice" parameterType="notice">
+		insert into 
+		TB_NOTICE(NOTICENO,TITLE,EMPLOYEE_ID,CONTENT,REGIST_DATE,REPLYNO)
+		values(#{noticeno},#{title},#{employeeId},#{content},sysdate,#{replyNo})
+	</update>	
+	
+	<select id="selectNoticeByNno" parameterType="int" resultType="notice">
+		select 
+		* 
+		from TB_NOTICE
+		where noticeno=#{noticeno}		
+	</select>
+	
+	<update id="updateNotice" parameterType="notice">
+		update TB_NOTICE
+		set 
+		title=#{title},content=#{content},modify_date=sysdate	
+		where noticeno=#{noticeno}
+	</update>
+	
+	<update id="deleteNotice" parameterType="int" >
+		delete 
+		from TB_NOTICE 
+		where noticeno=#{noticeno}		
+	</update>	
+	
+	
+	
+</mapper>

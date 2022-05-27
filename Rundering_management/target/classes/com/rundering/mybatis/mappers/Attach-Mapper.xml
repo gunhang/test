@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Attach-Mapper">
+	<resultMap type="attach" id="attachMap">
+		<result column="ATCH_FILE_NO" property="atchFileNo"/>
+		<result column="ATCH_FILE_SEQ" property="atchFileSeq"/>
+		<result column="BIZ_TYPE" property="bizType"/>
+		<result column="FILE_PATH" property="filePath"/>
+		<result column="FILE_NM" property="fileNm"/>
+		<result column="SAVE_FILE_NM" property="saveFileNm"/>
+		<result column="FILE_CONT_TYPE" property="fileContType"/>
+		<result column="FILE_SIZE" property="fileSize"/>
+		<result column="FILE_DOWN_CNT" property="fileDownCnt"/>
+		<result column="REG_DATE" property="regDate"/>
+		<result column="REG_USER_ID" property="regUserId"/>
+		<result column="UPD_DATE" property="updDate"/>
+		<result column="UPD_USER_ID" property="updUserId"/>
+	</resultMap>
+	
+	<select id="selectLaundryArticlesAttach" parameterType="attach">
+		select SAVE_FILE_NM
+		  from TB_ATTACH_FILE
+		 where ATCH_FILE_NO=#{atchFileNo}
+	</select>
+	
+	<insert id="insertLaundryArticlesAttach" parameterType="attach" >
+	 	INSERT INTO TB_ATTACH_FILE
+		(
+			ATCH_FILE_NO,
+			ATCH_FILE_SEQ,
+			BIZ_TYPE,
+			FILE_PATH,
+			FILE_NM,
+			SAVE_FILE_NM,
+			FILE_CONT_TYPE,
+			FILE_SIZE,
+			FILE_DOWN_CNT
+		) 
+		VALUES 
+		(
+			#{atchFileNo},
+			1,
+			'물품발주',
+			#{filePath},
+			#{fileNm},
+			#{saveFileNm},
+			#{fileContType},
+			#{fileSize},
+			0
+		)
+	</insert>
+	
+	<select id="selectFileNo" resultType="int">
+		 select 
+		 atch_file_no_seq.nextval
+		 from dual
+	</select>
+	
+	<select id="selectAttachVOByFileNo" resultMap="attachMap">
+		select *
+		  from TB_ATTACH_FILE
+		 where ATCH_FILE_NO = #{atchFileNo}
+	</select>
+	
+	
+	<update id="insertAttach">
+		INSERT INTO TB_ATTACH_FILE
+		(
+			ATCH_FILE_NO,
+			ATCH_FILE_SEQ,
+			BIZ_TYPE,
+			FILE_PATH,
+			FILE_NM,
+			SAVE_FILE_NM,
+			FILE_CONT_TYPE,
+			FILE_SIZE
+		) 
+		VALUES 
+		(
+			#{atchFileNo},
+			#{atchFileSeq},
+			#{bizType},
+			#{filePath},
+			#{fileNm},
+			#{saveFileNm},
+			#{fileContType},
+			#{fileSize}
+		)
+	</update>
+	
+	<delete id="deleteAttchFileRemoveByFileNo">
+		DELETE FROM TB_ATTACH_FILE
+		 WHERE
+	    ATCH_FILE_NO = #{atchFileNo}
+	</delete>
+	
+	
+	<select id="getAttachNoSeq" parameterType="str" resultType="int">
+		SELECT COUNT(*)
+		FROM TB_ATTACH_FILE
+		WHERE ATCH_FILE_NO = #{atchFileNo}
+	</select>
+	
+	<update id="deleteDeliveryPicture" parameterType="attach">
+		DELETE 
+      FROM TB_ATTACH_FILE
+      WHERE BIZ_TYPE = #{bizType}
+      and ATCH_FILE_NO = #{atchFileNo}
+	</update>
+	
+  
+</mapper>

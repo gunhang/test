@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="LaundryOrderDetail-Mapper">
+
+	<resultMap type="laundryOrderDetail" id="laundryOrderDetailMap">
+		<result column="DETAIL_ORDERNO" property="detailOrderno" />
+		<result column="ORDER_NO" 		 property="orderNo" />
+		<result column="PRICE"      property="price" />
+		<result column="LAUNDRY_ITEMS_CODE"  property="laundryItemsCode" />
+		<result column="QUANTITY" property="quantity" />
+		<result column="ITEMS_NAME" property="itemsName" />
+	</resultMap>
+	
+	<select id="selectlaundryOrderDetailListByOrderNo"  resultMap="laundryOrderDetailMap" parameterType="str">
+		select *
+		  from TB_LAUNDRY_ORDER_DETAIL
+		 where ORDER_NO = #{orderNo}
+	</select>
+
+</mapper>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="LaundryThroughput-Mapper">
+	<resultMap type="laundryThroughput" id="laundryThroughputMap">
+		<result column="THROUGHPUT_NO" property="throughputNo"/>
+		<result column="LAUNDRY_QUOTA" property="laundryQuota"/>
+		<result column="TOTAL_THROUGHPUT" property="totalThroughput"/>
+		<result column="OVERSHOOT" property="overshoot"/>
+		<result column="AREA" property="area"/>
+		<result column="LDATE" property="date"/>
+		<result column="BRANCH_CODE" property="branchCode"/>
+	</resultMap>
+	
+	<resultMap type="branch" id="branchMap">
+		<result column="BRANCH_CODE" property="branchCode"/>
+		<result column="BRANCH_NAME" property="branchName"/>
+		<result column="ZIP" property="zip"/>
+		<result column="BRANCH_LNDRPCRYMSLMCOQY" property="branchLndrpcrymslmcoqy"/>
+		<result column="BRANCH_REGIST_DATE" property="branchRegistDate"/>
+		<result column="BRANCH_CONTACT" property="branchContact"/>
+		<result column="BRANCH_MODIFY_DATE" property="branchModifyDate"/>
+		<result column="DELETE_YN" property="deleteYN"/>
+		<result column="TOPAREA" property="topareaCode"/>
+		<result column="ADD1" property="add1"/>
+		<result column="ADD2" property="add2"/>
+		<result column="AREA" property="area"/>
+	
+	</resultMap>
+	
+<sql id="search">
+	<if test="searchType == 'c'.toString()">
+		AND B.BRANCH_NAME LIKE '%'||#{keyword}||'%'
+	</if>
+
+	<if test="searchType == 't'.toString()">
+		AND D.NAME LIKE '%'||#{keyword}||'%' 
+	</if>
+</sql>
+
+	<select id="laundryQuotaList" resultMap="laundryThroughputMap">
+		SELECT 
+         A.THROUGHPUT_NO,
+         A.LAUNDRY_QUOTA,
+         A.TOTAL_THROUGHPUT,
+         A.OVERSHOOT,
+         A.AREA,
+         A.LDATE,
+         A.BRANCH_CODE,
+         ROUND(A.TOTAL_THROUGHPUT/A.LAUNDRY_QUOTA*100) as quotaPercent,
+         B.BRANCH_NAME as branchName,
+            D.NAME AS name
+        from TB_LAUNDRY_THROUGHPUT A, TB_BRANCH B, TB_EMPLOYEES C, TB_MEMBER D, TB_COM_CODE E
+       where A.BRANCH_CODE=B.BRANCH_CODE
+           AND C.POSITION = E.COM_CODE
+           AND E.COM_CODE_NM='지점장'
+           AND B.BRANCH_CODE=C.BRANCH_CODE
+           AND C.MEMBERNO=D.MEMBERNO
+           and TO_CHAR(A.LDATE,'YYYY/MM/DD')=TO_CHAR(SYSDATE,'YYYY/MM/DD')
+           <include refid="search" />
+		 order by A.LDATE desc
+	</select>
+	
+	<select id="laundryQuotaListCount" resultType="int">
+		SELECT 
+         COUNT(A.THROUGHPUT_NO)
+        from TB_LAUNDRY_THROUGHPUT A, TB_BRANCH B, TB_EMPLOYEES C, TB_MEMBER D, TB_COM_CODE E
+       where A.BRANCH_CODE=B.BRANCH_CODE
+           AND C.POSITION = E.COM_CODE
+           AND E.COM_CODE_NM='지점장'
+           AND B.BRANCH_CODE=C.BRANCH_CODE
+           AND C.MEMBERNO=D.MEMBERNO
+           and TO_CHAR(A.LDATE,'YYYY/MM/DD')=TO_CHAR(SYSDATE,'YYYY/MM/DD')
+           <include refid="search" />
+		 order by A.LDATE desc
+	</select>
+	
+	<select id="laundryQuotaDetail" resultMap="laundryThroughputMap" parameterType="str">
+		SELECT 
+			A.THROUGHPUT_NO,
+			A.LAUNDRY_QUOTA,
+			A.TOTAL_THROUGHPUT,
+			A.OVERSHOOT,
+			A.AREA,
+			A.LDATE,
+			A.BRANCH_CODE,
+			ROUND(A.TOTAL_THROUGHPUT/A.LAUNDRY_QUOTA*100) as quotaPercent,
+			B.BRANCH_NAME as branchName
+		  from TB_LAUNDRY_THROUGHPUT A, TB_BRANCH B
+		 where A.BRANCH_CODE=B.BRANCH_CODE
+		   and A.THROUGHPUT_NO=#{throughputNo}
+	</select>
+	
+	<select id="branchDetail" resultType="com.rundering.command.BranchInfoDetailCommand" parameterType="str">
+		SELECT 
+			A.BRANCH_NAME as branchName,
+			A.BRANCH_CODE as branchCode,
+			A.BRANCH_CONTACT as branchContact,
+			A.TOPAREA as topareaCode,
+			A.AREA as area,
+			A.ADD1 as add1,
+            A.ADD2 as add2,
+			C.NAME as name,
+			C.PHONE as phone,
+			C.EMAIL as email,
+			A.ADD1 || ' ' || A.ADD2 as addr,
+			A.BRANCH_LNDRPCRYMSLMCOQY AS branchLndrpcrymslmcoqy
+		  from TB_BRANCH A, TB_EMPLOYEES B, TB_MEMBER C, TB_COM_CODE D
+		 WHERE B.POSITION = D.COM_CODE
+           AND D.COM_CODE_NM='지점장'
+           and C.ID=B.EMPLOYEE_ID
+		   AND A.BRANCH_CODE = #{branchCode}
+           AND A.BRANCH_CODE=B.BRANCH_CODE
+           AND B.MEMBERNO=C.MEMBERNO
+	</select>
+	
+<!-- 	표 리스트 출력(지점별) -->
+	<select id="branchQuotaTable" resultMap="laundryThroughputMap" parameterType="str">
+		select *
+		  from TB_LAUNDRY_THROUGHPUT
+		 where BRANCH_CODE=#{branchCode}
+		 order by LDATE desc
+	</select>
+	
+<!-- 	//표 리스트 출력(일자별) -->
+	<select id="changeDateBranchQuotaTable" resultMap="laundryThroughputMap" parameterType="str">
+		select *
+		  from TB_LAUNDRY_THROUGHPUT
+		 where LDATE=#{date} 
+		 order by LDATE desc
+	</select>
+	
+<!-- 	//표 리스트 출력(일자별) -->
+	<select id="selectWeeksBranchLaundryThroughPut" resultMap="laundryThroughputMap" parameterType="laundryThroughput">
+		  	SELECT *
+		  FROM TB_LAUNDRY_THROUGHPUT
+		 WHERE BRANCH_CODE=#{branchCode}
+		   AND TO_CHAR(LDATE,'YYYY-MM-DD') BETWEEN to_char(#{date}-6,'YYYY-MM-DD')
+         								AND TO_CHAR(#{date},'YYYY-MM-DD')
+         order by LDATE	ASC				
+          
+	</select>
+	
+	<update id="updateBranchLndrpcrymslmcoqy" parameterType="branch">
+		update TB_BRANCH
+		   set BRANCH_LNDRPCRYMSLMCOQY=#{branchLndrpcrymslmcoqy }
+		 where branch_code=#{branchCode }
+	</update>
+</mapper>

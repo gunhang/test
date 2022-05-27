@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LaundryGoodsStock-Mapper">
+
+	<resultMap type="laundrygoodsstock" id="laundrygoodsstockMap">
+		<result column="BRANCH_CODE" property="branchCode"/>
+		<result column="ARTICLES_CODE" property="articlesCode"/>
+		<result column="SUPPLY_COUNT" property="supplyCount"/>
+	</resultMap>
+	<resultMap type="item" id="itemMap">
+		<result column="ARTICLES_CODE" property="articlesCode"/>
+		<result column="ARTICLES_NAME" property="articlesName"/>
+		<result column="CLCODE"  	   property="clcode"	/>
+		<result column="EACH"          property="each"/>
+		<result column="SUPPLY_COUNT"  property="supplyCount"/>
+		<result column="AUTO_ORDER_POINT" property="autoOrderPoint"/>
+		<result column="AUTO_ORDER_COUNT" property="autoOrderCount" />
+		<result column="AUTO_ORDER_YN" property="autoOrderYn"/>
+	</resultMap>
+	
+	
+	<select id="selectItemListByBranchCode" resultMap="itemMap">
+		select A.ARTICLES_CODE AS ARTICLES_CODE,
+		       A.ARTICLES_NAME AS ARTICLES_NAME,
+		       A.CLCODE AS CLCODE,
+		       A.EACH AS EACH,
+		       B.SUPPLY_COUNT AS SUPPLY_COUNT,
+		       B.AUTO_ORDER_POINT AS AUTO_ORDER_POINT,
+		       B.AUTO_ORDER_COUNT AS AUTO_ORDER_COUNT,
+		       B.AUTO_ORDER_YN AS AUTO_ORDER_YN
+		  from tb_laundry_articles A,TB_LAUNDRY_GOODS_STOCK B
+		 WHERE A.ARTICLES_CODE =B.ARTICLES_CODE
+		   AND B.BRANCH_CODE = #{branchCode}
+	</select>
+	
+	<select id="selectItemCountByBranchCode" resultType="int">
+		select COUNT(*)
+		  from tb_laundry_articles A,TB_LAUNDRY_GOODS_STOCK B
+		 WHERE A.ARTICLES_CODE =B.ARTICLES_CODE
+		   AND B.BRANCH_CODE = #{branchCode}
+	</select>
+	
+	<select id="selectSupplyCountByVO" resultType="int">
+		select SUPPLY_COUNT
+		  from TB_LAUNDRY_GOODS_STOCK 
+		 WHERE ARTICLES_CODE = #{articlesCode}
+		   AND BRANCH_CODE = #{branchCode}
+	</select>
+	
+	
+	
+	<insert id="insertLaundryGoodsStock">
+		insert into tb_laundry_goods_stock
+		(
+		BRANCH_CODE,
+		ARTICLES_CODE,
+		SUPPLY_COUNT
+		)values
+		(
+		#{branchCode},
+		#{articlesCode},
+		0
+		)
+	</insert>
+	
+	<update id="updateLaundryGoodsStockCountByVO" parameterType="laundrygoodsstock">
+		update tb_laundry_goods_stock
+		   set supply_count=supply_count+#{supplyCount}
+		 where branch_code=#{branchCode}
+		   and articles_code=#{articlesCode} 
+	</update>
+	<update id="updateLaundryGoodsStockAutoOrderByVO" parameterType="laundrygoodsstock">
+		update tb_laundry_goods_stock
+		   set auto_order_yn=#{autoOrderYn}
+		 where branch_code=#{branchCode}
+		   and articles_code=#{articlesCode} 
+	</update>
+	<update id="updateLaundryGoodsStockAutoOrderPointByVO" parameterType="laundrygoodsstock">
+		update tb_laundry_goods_stock
+		   set auto_order_point=#{autoOrderPoint}
+		 where branch_code=#{branchCode}
+		   and articles_code=#{articlesCode} 
+	</update>
+	<update id="updateLaundryGoodsStockAutoOrderCountByVO" parameterType="laundrygoodsstock">
+		update tb_laundry_goods_stock
+		   set auto_order_count=#{autoOrderCount}
+		 where branch_code=#{branchCode}
+		   and articles_code=#{articlesCode} 
+	</update>
+	
+	<update id="updateLaundryGoodsStockSupplyCountByVO" parameterType="laundrygoodsstock">
+		update tb_laundry_goods_stock
+		   set supply_count=#{supplyCount}
+		 where branch_code=#{branchCode}
+		   and articles_code=#{articlesCode} 
+	</update>
+	
+	
+	
+	
+</mapper>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="LaundryOrder-Mapper">
+
+	<resultMap type="laundryOrder" id="laundryOrderMap">
+		<result column="ORDER_NO" 		 property="orderNo" />
+		<result column="REQUEST_DETAILS" property="requestDetails" />
+		<result column="ORDER_DATE"      property="orderDate" />
+		<result column="CONTACT_NUMBER"  property="contactNumber" />
+		<result column="DELIVERY_REQUEST_DATE" property="deliveryRequestDate" />
+		<result column="TOTAL_PRICE" property="totalPrice" />
+		<result column="PICKUP_REQUEST_DATE" property="pickupRequestDate" />
+		<result column="PICKUP_DATE" property="pickupDate" />
+		<result column="BRANCH_ARRIVAL_DATE" property="branchArrivalDate" />
+		<result column="AREA" property="area" />
+		<result column="DELIVERY_DATE" property="deliveryDate" />
+		<result column="ORDER_STATUS" property="orderStatus" />
+		<result column="CANCEL_YN" property="cancelYn" />
+		<result column="PAYMENTNO" property="paymentNo" />
+		<result column="BRANCH_CODE" property="branchCode" />
+		<result column="MEMBERNO" property="memberNo" />
+		<result column="DELIVERY_EMPLOYEE_ID" property="deliveryEmployeeId" />
+		<result column="PICKUP_EMPLOYEE_ID" property="pickupEmployeeId" />
+		<result column="ZIP" property="zip" />
+		<result column="ADD1" property="add1" />
+		<result column="ADD2" property="add2" />
+		<result column="ATCH_FILE_NO" property="atchFileNo" />
+		<result column="REPLYNO" property="replyNo" />
+	</resultMap>
+
+	<select id="selectLaundryOrderSequenceNextValue" resultType="str">
+		select FN_LAUNDRY_ORDER_NO('now') from DUAL
+	</select>
+
+	<update id="insertLaundryOrder" parameterType="laundryOrder">
+		<choose>
+			<when test="requestDetails != null">
+				INSERT INTO TB_LAUNDRY_ORDER
+					(ORDER_NO,
+					CONTACT_NUMBER,
+					ZIP,
+					ADD1,
+					ADD2,
+					DELIVERY_REQUEST_DATE,
+					PICKUP_REQUEST_DATE,
+					REQUEST_DETAILS,
+					MEMBERNO,
+					AREA,
+					TOTAL_PRICE,
+					PAYMENTNO,
+					ATCH_FILE_NO,
+					REPLYNO)
+					VALUES (
+					#{orderNo},
+					#{contactNumber},
+					#{zip},
+					#{add1},
+					#{add2},
+					#{deliveryRequestDate},
+					#{pickupRequestDate},
+					#{requestDetails},
+					#{memberNo},
+					#{area},
+					#{totalPrice},
+					#{paymentNo},
+					#{atchFileNo},
+					#{replyNo}
+					)
+			</when>
+	
+			<otherwise>
+				INSERT INTO TB_LAUNDRY_ORDER
+					(ORDER_NO,
+					CONTACT_NUMBER,
+					ZIP,
+					ADD1,
+					ADD2,
+					DELIVERY_REQUEST_DATE,
+					PICKUP_REQUEST_DATE,
+					MEMBERNO,
+					AREA,
+					TOTAL_PRICE,
+					PAYMENTNO,
+					ATCH_FILE_NO,
+					REPLYNO)
+					VALUES (
+					#{orderNo},
+					#{contactNumber},
+					#{zip},
+					#{add1},
+					#{add2},
+					#{deliveryRequestDate},
+					#{pickupRequestDate},
+					#{memberNo},
+					#{area},
+					#{totalPrice},
+					#{paymentNo},
+					#{atchFileNo},
+					#{replyNo}
+					)
+			</otherwise>
+		</choose>
+	</update>
+	
+	<select id="selectLaundryOrderByOrderNo" parameterType="str" resultMap="laundryOrderMap">
+		SELECT * FROM TB_LAUNDRY_ORDER WHERE ORDER_NO = #{orderNo}
+	</select>
+	
+	<select id="getmyorderList" parameterType="str" resultMap="laundryOrderMap">
+		SELECT  
+		A.ORDER_NO AS ORDER_NO
+        ,A.ORDER_DATE AS ORDER_DATE
+        ,A.TOTAL_PRICE AS TOTAL_PRICE 
+        ,(SELECT 
+        D.BRANCH_NAME
+        FROM TB_BRANCH D
+        WHERE A.BRANCH_CODE = D.BRANCH_CODE
+        AND A.MEMBERNO = #{memberNo}) AS BRANCH_CODE
+        ,(SELECT  
+		B.COM_CODE_NM
+		FROM ORDER_STATUS B
+		WHERE A.MEMBERNO=#{memberNo}
+		AND A.ORDER_STATUS=b.COM_CODE) AS ORDER_STATUS
+        ,(SELECT 
+        C.PAYMENT_NAME
+        FROM TB_PAYMENT C
+        WHERE A.PAYMENTNO = C.PAYMENTNO
+        AND A.MEMBERNO = #{memberNo}) AS PAYMENTNO
+        ,A.ATCH_FILE_NO AS ATCH_FILE_NO
+		FROM TB_LAUNDRY_ORDER A
+		WHERE A.MEMBERNO=#{memberNo}
+		AND A.CANCEL_YN='N'
+	</select>
+	
+	<select id="myOrderListCount" resultType="int" parameterType="str">
+		select count(*)
+		FROM TB_LAUNDRY_ORDER
+		WHERE MEMBERNO=#{memberNo}
+	</select>
+	
+</mapper>

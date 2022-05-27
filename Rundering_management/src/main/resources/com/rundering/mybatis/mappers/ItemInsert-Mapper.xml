@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="ItemInsert-Mapper">
+  <resultMap type="itemInsert" id="itemInsertMap">
+		<result column="ARTICLES_CODE"  property="articlesCode"/>
+		<result column="INSERT_DATE"  property="insertDate"/>
+		<result column="ITEM_COUNT"  property="itemCount"/>
+		<result column="BRANCH_CODE"  property="branchCode"/>
+		<result column="ORDER_NO"  property="orderNo"/>
+	</resultMap>
+	
+	<select id="selectDayItemByItem" resultType="item">
+		 SELECT SUM(ITEM_COUNT) as sum,
+		        TO_CHAR(sysdate-#{number},'YYYY-MM-DD')  as day
+	  	   FROM TB_ITEM_INSERT
+	   	  WHERE INSERT_DATE BETWEEN SYSDATE-#{number2}
+	  	                 AND SYSDATE -#{number}
+	        AND BRANCH_CODE=#{branchCode}
+	        and articles_code=#{articlesCode}
+	</select>
+	
+	<select id="selectItemInsertList" resultMap="itemInsertMap">
+		select *
+		  from tb_item_insert
+		 where branch_code=#{branchCode}
+		 ORDER BY insert_date ASC 
+	</select>
+	<select id="selectItemInsertCount" resultType="int" >
+		select count(*)
+		  from tb_item_insert
+		 where branch_code=#{branchCode}
+		 ORDER BY insert_date ASC 
+	</select>
+	
+	
+	<insert id="insertItemIsert" parameterType="itemInsert">
+		insert into tb_item_insert
+		(
+		articles_code,
+		item_count,
+		branch_code,
+		order_no
+		)values
+		(
+		#{articlesCode},
+		#{itemCount},
+		#{branchCode},
+		#{orderNo}
+		)
+	</insert>
+
+	
+	
+	
+	</mapper>
